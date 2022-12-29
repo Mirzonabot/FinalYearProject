@@ -128,12 +128,12 @@ public class Signup extends AppCompatActivity {
                                     });
 
                             System.out.println("you are in 7");
-//                            Toast.makeText(Register.this,"User created!",Toast.LENGTH_LONG).show();
+                            Toast.makeText(Signup.this,"User created!",Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
 //                            startActivity(new Intent(getApplicationContext(),UserHomePage.class));
                         }else {
                             System.out.println("you are in 8");
-//                            Toast.makeText(Register.this,"error!"+task.getException().getLocalizedMessage(),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Signup.this,"error!"+task.getException().getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
                         }
                     }

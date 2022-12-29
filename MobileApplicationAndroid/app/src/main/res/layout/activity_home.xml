@@ -6,4 +6,57 @@
     android:layout_height="match_parent"
     tools:context=".Home">
 
+    <ImageView
+        android:id="@+id/setting"
+        android:layout_width="58dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_settings_24" />
+
+    <TextView
+        android:id="@+id/goingToBooking"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:paddingStart="20px"
+        android:paddingLeft="20px"
+        android:paddingTop="20px"
+        android:paddingEnd="20px"
+        android:paddingRight="20px"
+        android:paddingBottom="20px"
+        android:text="Booking a homestay"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/goingToHomestays"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="256dp"
+        android:padding="20px"
+        android:paddingStart="20px"
+        android:paddingLeft="20px"
+        android:paddingTop="20px"
+        android:paddingEnd="20px"
+        android:paddingRight="20px"
+        android:paddingBottom="20px"
+        android:text="Manage your own homestay"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="@+id/goingToBooking"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="@+id/goingToBooking"
+        app:layout_constraintTop_toBottomOf="@+id/goingToBooking" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        tools:layout_editor_absoluteX="176dp"
+        tools:layout_editor_absoluteY="72dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
