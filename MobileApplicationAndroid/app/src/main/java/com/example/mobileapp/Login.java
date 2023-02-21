@@ -56,6 +56,11 @@ public class Login extends AppCompatActivity {
 //        forgotPassword = findViewById(R.id.forgotPassword);
 
         fAuth = FirebaseAuth.getInstance();
+        System.out.println("Current User: ");
+        System.out.println();
+        if (fAuth.getCurrentUser() != null){
+            startActivity(new Intent(getApplicationContext(),Home.class));
+        }
 
 //        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
 //                .requestIdToken(getString(R.string.default_web_client_id))
@@ -100,13 +105,7 @@ public class Login extends AppCompatActivity {
                         if (task.isSuccessful()){
                             Toast.makeText(Login.this,"Logged in Successfully",Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
-                            FirebaseUser user1 = FirebaseAuth.getInstance().getCurrentUser();
-//                            if (user1.getDisplayName()!=null) {
-                                startActivity(new Intent(getApplicationContext(), Home.class));
-//                            }
-//                            else {
-//                                startActivity(new Intent(getApplicationContext(), AdminHomePage.class));
-//                            }
+                            startActivity(new Intent(getApplicationContext(), Home.class));
                         }
                         else {
                             Toast.makeText(Login.this,"Error! "+task.getException().getMessage(),Toast.LENGTH_SHORT).show();

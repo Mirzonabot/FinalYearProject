@@ -16,47 +16,103 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_baseline_settings_24" />
 
-    <TextView
-        android:id="@+id/goingToBooking"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:paddingStart="20px"
-        android:paddingLeft="20px"
-        android:paddingTop="20px"
-        android:paddingEnd="20px"
-        android:paddingRight="20px"
-        android:paddingBottom="20px"
-        android:text="Booking a homestay"
-        android:textSize="20sp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="128dp"
+        android:layout_marginEnd="20dp"
+        android:background="#BFA3A3"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="30px"
+
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/goingToHomestays"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="256dp"
-        android:padding="20px"
-        android:paddingStart="20px"
-        android:paddingLeft="20px"
-        android:paddingTop="20px"
-        android:paddingEnd="20px"
-        android:paddingRight="20px"
-        android:paddingBottom="20px"
-        android:text="Manage your own homestay"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="@+id/goingToBooking"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="@+id/goingToBooking"
-        app:layout_constraintTop_toBottomOf="@+id/goingToBooking" />
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20px"
+            android:background="#AF9292"
+            android:padding="30px"
+            android:text="This section is for customers. Customers can explore homestays and book any available homestay."
+            android:textAlignment="textStart"
+            android:textSize="16sp"
+            tools:layout_editor_absoluteX="55dp"
+            tools:layout_editor_absoluteY="107dp" />
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/goingToBooking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:paddingStart="20px"
+            android:paddingLeft="20px"
+            android:paddingTop="20px"
+            android:paddingEnd="20px"
+            android:paddingRight="20px"
+            android:paddingBottom="20px"
+            android:text="Booking a homestay"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            tools:layout_editor_absoluteX="116dp"
+            tools:layout_editor_absoluteY="248dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="176dp"
-        tools:layout_editor_absoluteY="72dp" />
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="104dp"
+        android:layout_marginEnd="20dp"
+        android:background="#BFA3A3"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="30px"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20px"
+            android:background="#AF9292"
+            android:padding="30px"
+            android:text="This section is for owners of homestays. Homestay providers can create and manage their homestays."
+            android:textAlignment="textStart"
+            android:textSize="16sp"
+            tools:layout_editor_absoluteX="55dp"
+            tools:layout_editor_absoluteY="107dp" />
+
+        <TextView
+            android:id="@+id/goingToHomestays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/teal_200"
+            android:paddingStart="20px"
+            android:paddingLeft="20px"
+            android:paddingTop="20px"
+            android:paddingEnd="20px"
+            android:paddingRight="20px"
+            android:paddingBottom="20px"
+            android:text="Manage your own homestay
+"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            tools:layout_editor_absoluteX="116dp"
+            tools:layout_editor_absoluteY="248dp" />
+
+    </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
