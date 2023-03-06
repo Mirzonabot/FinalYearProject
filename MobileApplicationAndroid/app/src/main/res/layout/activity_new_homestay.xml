@@ -1,74 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="80dp"
     tools:context=".NewHomestay">
 
-    <EditText
-        android:id="@+id/addressOfHomestay"
-        android:layout_width="205dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="40dp"
-        android:ems="10"
-        android:hint="Address of Homestay"
-        android:inputType="textPersonName"
-        android:textColorHint="@color/input_hint"
-        app:layout_constraintEnd_toEndOf="@+id/homestayName"
-        app:layout_constraintStart_toStartOf="@+id/homestayName"
-        app:layout_constraintTop_toBottomOf="@+id/homestayName" />
-
-
     <TextView
+
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_marginBottom="50px"
+        android:width="800px"
+        android:gravity="center"
         android:padding="10px"
+        android:paddingBottom="40dp"
         android:text="Add a new Homestay"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="20sp" />
 
     <EditText
+        android:id="@+id/city"
+        android:layout_width="wrap_content"
+        android:layout_height="49dp"
+        android:layout_below="@+id/numAvailableSpaces"
+        android:width="800px"
+        android:ems="10"
+        android:hint="Name of city"
+        android:inputType="textPersonName"
+        android:textColorHint="@color/input_hint" />
+
+    <EditText
+        android:id="@+id/district"
+        android:layout_width="wrap_content"
+        android:layout_height="49dp"
+        android:layout_below="@+id/city"
+        android:width="800px"
+        android:ems="10"
+        android:hint="Name of district"
+        android:inputType="textPersonName"
+        android:textColorHint="@color/input_hint" />
+
+    <EditText
+        android:id="@+id/village"
+        android:layout_width="wrap_content"
+        android:layout_height="49dp"
+        android:layout_below="@+id/district"
+        android:width="800px"
+        android:ems="10"
+        android:hint="Name of village"
+        android:inputType="textPersonName"
+        android:textColorHint="@color/input_hint" />
+    <EditText
+        android:id="@+id/street"
+        android:layout_width="wrap_content"
+        android:layout_height="49dp"
+        android:layout_below="@+id/village"
+        android:width="800px"
+        android:ems="10"
+        android:hint="Name of street"
+        android:inputType="textPersonName"
+        android:textColorHint="@color/input_hint" />
+
+
+    <EditText
+
         android:id="@+id/homestayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:ems="10"
+        android:layout_marginTop="30dp"
+        android:width="800px"
         android:hint="Name of Homestay"
         android:inputType="textPersonName"
         android:textColorHint="@color/input_hint"
-        app:layout_constraintEnd_toEndOf="@+id/textView4"
-        app:layout_constraintStart_toStartOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        android:layout_below="@+id/textView4"/>
 
     <EditText
         android:id="@+id/numAvailableSpaces"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:ems="10"
+        android:layout_below="@+id/homestayName"
+        android:width="800px"
         android:hint="Number of available places"
         android:inputType="numberDecimal"
-        android:textColorHint="@color/input_hint"
-        app:layout_constraintEnd_toEndOf="@+id/addressOfHomestay"
-        app:layout_constraintStart_toStartOf="@+id/addressOfHomestay"
-        app:layout_constraintTop_toBottomOf="@+id/addressOfHomestay" />
+        android:textColorHint="@color/input_hint" />
 
     <ImageView
+
         android:id="@+id/addLocationFromMap"
         android:layout_width="44dp"
         android:layout_height="46dp"
+        android:layout_below="@+id/street"
+        android:layout_centerHorizontal="true"
         android:layout_marginStart="30dp"
-        app:layout_constraintBottom_toBottomOf="@+id/addressOfHomestay"
-        app:layout_constraintStart_toEndOf="@+id/addressOfHomestay"
-        app:layout_constraintTop_toTopOf="@+id/addressOfHomestay"
-        app:layout_constraintVertical_bias="1.0"
+        android:layout_marginTop="50dp"
         app:srcCompat="@drawable/ic_baseline_add_location_24" />
 
+    <ImageView
+        android:id="@+id/addLocationFromGoogle"
+        android:layout_width="44dp"
+        android:layout_height="46dp"
+        android:layout_below="@+id/street"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_toEndOf="@+id/addLocationFromMap"
+        app:srcCompat="@drawable/ic_baseline_add_location_24" />
+
+    <Button
+        android:id="@+id/btnAddHomestay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/addLocationFromGoogle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:padding="10dp"
+        android:text="Add Homestay"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
+
+</RelativeLayout>

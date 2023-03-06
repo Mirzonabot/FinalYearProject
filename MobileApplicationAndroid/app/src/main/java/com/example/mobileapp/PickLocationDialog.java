@@ -2,8 +2,10 @@ package com.example.mobileapp;
 
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,15 +15,11 @@ import androidx.fragment.app.DialogFragment;
 import com.yandex.mapkit.Animation;
 import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Point;
-import com.yandex.mapkit.layers.GeoObjectTapEvent;
-import com.yandex.mapkit.layers.GeoObjectTapListener;
-import com.yandex.mapkit.map.CameraListener;
+
 import com.yandex.mapkit.map.CameraPosition;
-import com.yandex.mapkit.map.CameraUpdateReason;
 import com.yandex.mapkit.map.InputListener;
 import com.yandex.mapkit.map.Map;
-import com.yandex.mapkit.map.MapLoadStatistics;
-import com.yandex.mapkit.map.MapLoadedListener;
+
 import com.yandex.mapkit.map.MapType;
 import com.yandex.mapkit.mapview.MapView;
 
@@ -29,8 +27,18 @@ import com.yandex.mapkit.mapview.MapView;
 
 
 public class PickLocationDialog extends DialogFragment {
+
+    public interface OnInputListener{
+        void sendInput(String lat, String lon);
+    }
+
+    public OnInputListener onInputListener;
+
     private static final String TAG = "PickLocationDialog";
     private MapView mapView;
+    private Button pickLocationButton;
+    private String latitude;
+    private String longitude;
 
 
 
@@ -40,6 +48,9 @@ public class PickLocationDialog extends DialogFragment {
             System.out.println("Tapped!!!!!!!!!!!!!!!");
             System.out.println("Latitude: " + point.getLatitude());
             System.out.println("Longitude: " + point.getLongitude());
+            latitude = String.valueOf(point.getLatitude());
+            longitude = String.valueOf(point.getLongitude());
+            map.getMapObjects().clear();
             map.getMapObjects().addPlacemark(point);
 
         }
@@ -57,9 +68,10 @@ public class PickLocationDialog extends DialogFragment {
         MapKitFactory.initialize(getActivity());
 
 
+
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_pick_location,null);
         mapView = view.findViewById(R.id.mapView);
-
+        pickLocationButton = view.findViewById(R.id.btnPickLocation);
         mapView.showContextMenu();
 
 
@@ -73,7 +85,22 @@ public class PickLocationDialog extends DialogFragment {
 
         mapView.getMap().addInputListener(inputListener);
 
+        pickLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                System.out.println("Clicked!!!!!!!!!!!!!!!");
+//                System.out.println(mapView.getMap().);
+                System.out.println(mapView.getMap().getCameraPosition().getTarget().getLongitude());
+                System.out.println(mapView.getMap().getCameraPosition().getTarget().getLatitude());
+
+                //  pass latitude and longitude to the activity
+                onInputListener.sendInput(latitude,longitude);
+                getDialog().dismiss();
+
+
+            }
+        });
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(view);
@@ -99,5 +126,15 @@ public class PickLocationDialog extends DialogFragment {
     protected void finalize() throws Throwable {
         System.out.println("finalized!!!!!");
         super.finalize();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            onInputListener = (OnInputListener) getActivity();
+        }catch (ClassCastException e){
+            System.out.println("ClassCastException: " + e.getMessage());
+        }
     }
 }

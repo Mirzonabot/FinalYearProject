@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Homestay Booking</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string-array name="spinnerItems">
+        <item>By village</item>
+        <item>By street</item>
+        <item>By district</item>
+        <item>By city</item>
+    </string-array>
 </resources>

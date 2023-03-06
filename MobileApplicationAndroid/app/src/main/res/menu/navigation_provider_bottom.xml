@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/add_new_homestay"
+        android:enabled="true"
+        android:icon="@drawable/add_new_homestay_foreground"
+        android:title="Homestay"/>
+
+</menu>

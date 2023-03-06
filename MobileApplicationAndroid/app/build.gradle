@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.example.mobileapp'
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.mobileapp"
         minSdk 23
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -28,6 +28,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -36,11 +39,14 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.firebase:firebase-auth:21.1.0'
-    implementation 'com.yandex.android:maps.mobile:4.2.2-full'
+    implementation 'com.yandex.android:maps.mobile:4.2.2-lite'
 
-    implementation 'com.google.android.gms:play-services-maps:20.2.0'
-    implementation "com.google.android.gms:play-services-location:21.0.1"
+//    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'org.osmdroid:osmdroid-android:6.1.11'
+    implementation 'com.google.firebase:firebase-database:20.1.0'
 
+//    implementation 'com.applandeo:material-calendar-view:1.0.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Login">
-
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -12,11 +9,11 @@
         android:padding="16dp">
 
         <ImageView
+            android:layout_marginTop="40dp"
             android:id="@+id/image_view_logo"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="40dp"
             android:src="@drawable/homestay" />
 
         <EditText
@@ -57,7 +54,6 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="16dp"
             android:text="Forgot Password?" />
-
         <TextView
             android:id="@+id/create_new_account"
             android:layout_width="wrap_content"
@@ -66,23 +62,19 @@
             android:layout_alignParentEnd="true"
             android:layout_marginTop="16dp"
             android:text="Sign up" />
-
         <com.google.android.gms.common.SignInButton
             android:id="@+id/button_google_signin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/button_login"
-            android:layout_marginTop="16dp" />
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/create_new_account"
-            android:layout_centerInParent="true"
-            android:visibility="invisible" />
+            android:layout_marginTop="16dp"
+            android:layout_below="@+id/button_login"/>
 
 
     </RelativeLayout>
 
 </ScrollView>
+
+
+
+
+

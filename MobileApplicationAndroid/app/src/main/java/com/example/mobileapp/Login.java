@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -45,12 +46,13 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
-        createNewAccount = findViewById(R.id.createNewAccount);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnLoginGoogle = findViewById(R.id.googleLoginBtn);
-        mEmail = findViewById(R.id.loginEmail);
-        mPassword = findViewById(R.id.loginPassword);
+        createNewAccount = findViewById(R.id.create_new_account);
+        btnLogin = findViewById(R.id.button_login);
+//        btnLoginGoogle = findViewById(R.id.button_google_signin);
+        mEmail = findViewById(R.id.edit_text_username);
+        mPassword = findViewById(R.id.edit_text_password);
         progressBar = findViewById(R.id.progressBar);
 
 //        forgotPassword = findViewById(R.id.forgotPassword);
