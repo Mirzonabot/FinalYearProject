@@ -105,44 +105,6 @@ public class HomestayAdapter extends RecyclerView.Adapter<HomestayAdapter.ViewHo
             holder.toggleButton.setChecked(true);
         }
 
-//        holder.homestayCalendar.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Calendar calendar = Calendar.getInstance();
-//                int year = calendar.get(Calendar.YEAR);
-//                int month = calendar.get(Calendar.MONTH);
-//                int day = calendar.get(Calendar.DAY_OF_MONTH);
-//
-//                // Create a DatePickerDialog instance
-//                DatePickerDialog datePickerDialog = new DatePickerDialog(v.getContext(),
-//                        new DatePickerDialog.OnDateSetListener() {
-//                            @Override
-//                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                                // Do something when a date is selected
-//                                // For example, update a TextView with the selected date
-//                                String selectedDate = String.format(Locale.getDefault(), "%d/%d/%d", dayOfMonth, monthOfYear + 1, year);
-//                                System.out.println(selectedDate);
-////                                textView.setText(selectedDate);
-//                                Toast.makeText(mContext, selectedDate, Toast.LENGTH_SHORT).show();
-//                            }
-//                        }, year, month, day);
-//
-//// Set the long click listener to the date picker's calendar view
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    datePickerDialog.getDatePicker().setOnDateChangedListener(new DatePicker.OnDateChangedListener() {
-//                        @Override
-//                        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                            System.out.println("onDateChanged");
-//                        }
-//                    });
-//                }
-//
-//// Show the DatePickerDialog
-//                datePickerDialog.show();
-//
-//            }
-//        });
         holder.homestayCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

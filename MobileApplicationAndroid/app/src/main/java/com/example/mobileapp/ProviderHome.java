@@ -38,7 +38,6 @@ import java.util.List;
 public class ProviderHome extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_LOCATION = 1;
-    TextView createNewHomestay;
     private ArrayList<Homestay> homestaysList;
     private HomestayAdapter homestayAdapter;
     private RecyclerView recyclerView;
@@ -96,6 +95,9 @@ public class ProviderHome extends AppCompatActivity {
                 switch (item.getItemId()){
                     case R.id.add_new_homestay:
                         startActivity(new Intent(getApplicationContext(), NewHomestay.class));
+                        break;
+                    case R.id.viewBookings:
+                        startActivity(new Intent(getApplicationContext(), ProviderBookings.class));
                         break;
                     default:
                         break;

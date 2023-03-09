@@ -1,14 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
-        android:id="@+id/add_new_homestay"
+        android:id="@+id/search_bar"
         android:enabled="true"
-        android:icon="@drawable/add_new_homestay_foreground"
-        android:title="Homestay"/>
+        android:icon="@drawable/ic_search_foreground"
+        android:title="Search"/>
     <item
         android:id="@+id/viewBookings"
         android:enabled="true"
         android:icon="@drawable/ic_booking_foreground"
         android:title="Bookings"/>
-
 </menu>

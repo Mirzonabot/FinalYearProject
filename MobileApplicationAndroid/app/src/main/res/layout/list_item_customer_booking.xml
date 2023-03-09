@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:padding="16dp">
+
+
+
+
+
+        <TextView
+            android:id="@+id/checkin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check-in "
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/checkout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checkin"
+            android:text="Check-out: "
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/userBookedBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checkout"
+            android:text="Booked at: "
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/checkin"
+            android:layout_alignParentEnd="true"
+            android:text="requested"
+            android:enabled="false"/>
+
+
+
+    </RelativeLayout>
+
+
+</androidx.cardview.widget.CardView>

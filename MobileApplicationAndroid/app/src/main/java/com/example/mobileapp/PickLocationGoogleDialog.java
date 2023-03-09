@@ -85,7 +85,11 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
         mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         //set map to a location and zoom in
         float zoomLevel = 6.0f;
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(38.861034,71.27609299999995), zoomLevel));
+        GPSTracker gpsTrackerr = new GPSTracker(getActivity());
+        Location myLocationn = gpsTrackerr.getLocation();
+        double clon = myLocationn.getLongitude();
+        double clat = myLocationn.getLatitude();
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(clat,clon), zoomLevel));
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
@@ -108,7 +112,7 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
             double longitude = myLocation.getLongitude();
             double latitude = myLocation.getLatitude();
             mMap.addMarker(new MarkerOptions().position(new LatLng(latitude,longitude)).title("Current Location")).
-                    setIcon(BitmapFromVector(getActivity().getApplicationContext(), R.drawable.ic_current_location));
+                    setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
             System.out.println("longitude: " + longitude);
             System.out.println("latitude: " + latitude);
         }
