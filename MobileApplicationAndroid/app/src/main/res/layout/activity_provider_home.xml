@@ -4,21 +4,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     tools:context=".ProviderHome">
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#6200EE"/>
+        android:layout_height="match_parent"
+        android:id="@+id/relativeLayout"
+        android:visibility="gone"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You have no homestays yet"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myHomestaysRecyclerView"
-        android:layout_width="409dp"
-        android:layout_height="673dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="3dp"
-        android:layout_below="@+id/toolbar"
         android:layout_above="@+id/bottom_navigation"
         />
     <com.google.android.material.bottomnavigation.BottomNavigationView

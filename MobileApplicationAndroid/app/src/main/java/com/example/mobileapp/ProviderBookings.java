@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,8 +21,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class ProviderBookings extends AppCompatActivity {
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, recyclerView1;
     private ArrayList<Booking> bookingsList = new ArrayList<>();
+    private RelativeLayout goNewHomestayLayout;
+    private TextView goNewHomestay;
     private BookingProviderAdopter bookingProviderAdopter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +47,17 @@ public class ProviderBookings extends AppCompatActivity {
                     // Do something with the book object
                     bookingsList.add(booking);
                 }
-                System.out.println(bookingsList.toString());
-                System.out.println(bookingsList.get(0).getCheckInDate());
+//                System.out.println(bookingsList.toString());
+//                System.out.println(bookingsList.get(0).getCheckInDate());
+
+                if (bookingsList.size() == 0) {
+                    goNewHomestayLayout.setVisibility(RelativeLayout.VISIBLE);
+                    recyclerView.setVisibility(RelativeLayout.GONE);
+                } else {
+                    goNewHomestayLayout.setVisibility(RelativeLayout.GONE);
+                    recyclerView.setVisibility(RelativeLayout.VISIBLE);
+                }
+
                 bookingProviderAdopter.setBookingList(bookingsList);
             }
 
@@ -64,5 +77,6 @@ public class ProviderBookings extends AppCompatActivity {
 
     private void init() {
         recyclerView = findViewById(R.id.providerBookingsRecyclerView);
+        goNewHomestayLayout = findViewById(R.id.goNewHomestayLayout);
     }
 }

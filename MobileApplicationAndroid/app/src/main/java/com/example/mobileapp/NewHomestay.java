@@ -38,7 +38,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         super.onCreate(savedInstanceState);
         MapKitFactory.setApiKey("69044d6e-9641-4c53-8d74-897fb9363d17");
         setContentView(R.layout.activity_new_homestay);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         initInputs();
         initListeners();
 

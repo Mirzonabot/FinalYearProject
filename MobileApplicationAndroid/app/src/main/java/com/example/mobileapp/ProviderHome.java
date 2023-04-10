@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -42,6 +43,7 @@ public class ProviderHome extends AppCompatActivity {
     private HomestayAdapter homestayAdapter;
     private RecyclerView recyclerView;
     private LocationManager mLocationManager;
+    private RelativeLayout relativeLayout;
 
     private MaterialToolbar toolbar;
     private BottomNavigationView bottomNavigationView;
@@ -54,14 +56,13 @@ public class ProviderHome extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.myHomestaysRecyclerView);
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
-        toolbar = (MaterialToolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("My Homestays");
-        
+        relativeLayout = findViewById(R.id.relativeLayout);
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        if (!isGpsEnabled) {
+            startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        }
 
 
         FirebaseApp.initializeApp(this);
@@ -79,6 +80,13 @@ public class ProviderHome extends AppCompatActivity {
                     Homestay homestay = homestaySnapshot.getValue(Homestay.class);
                     // Do something with the book object
                     homestaysList.add(homestay);
+                }
+                if (homestaysList.size() == 0) {
+                    relativeLayout.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    relativeLayout.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
                 homestayAdapter.setHomestayList(homestaysList);
             }

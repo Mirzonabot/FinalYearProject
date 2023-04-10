@@ -7,4 +7,12 @@
         <item>By district</item>
         <item>By city</item>
     </string-array>
+    <string name="customer_guide_text" translatable="false">This section is for customers. Customers can explore homestays and book any available homestay.</string>
+    <string name="owner_guide_text" translatable="false">This section is for owners of homestays. Homestay providers can create and manage their homestays.</string>
+    <string name="booking_home_button_text" translatable="false">Booking a homestay</string>
+    <string name="manage_home_button_text" translatable="false">Manage your homestays</string>
+    <string name="language" translatable="false">Language</string>
+    <string name="tajik" translatable="false">Tajik</string>
+    <string name="english" translatable="false">English</string>
+    <string name="logout" translatable="false">Logout</string>
 </resources>

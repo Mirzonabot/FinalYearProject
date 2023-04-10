@@ -4,11 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProviderBookings">
+    tools:context=".ProviderBookings"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/goNewHomestayLayout"
+        >
+
+        <TextView
+            android:id="@+id/goNewHomestay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="You have no bookings yet."
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/providerBookingsRecyclerView"
-        android:layout_width="409dp"
-        android:layout_height="673dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginTop="3dp"
         />
 

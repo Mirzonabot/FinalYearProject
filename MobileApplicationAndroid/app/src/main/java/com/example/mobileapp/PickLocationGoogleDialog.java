@@ -7,7 +7,10 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.InflateException;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -35,6 +38,7 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
     public interface OnInputListener{
         void sendInput(String lat, String lon);
     }
+    private static View view;
 
 
     public PickLocationGoogleDialog.OnInputListener onInputListener;
@@ -42,7 +46,7 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
     private String longitude;
     private GoogleMap mMap;
     private Button btnPickLocation;
-
+    private SupportMapFragment supportMapFragment;
     public PickLocationGoogleDialog() {
         // Required empty public constructor
     }
@@ -52,9 +56,31 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_pick_location_google, null,false);
+        System.out.println("onCreateDialog");
+        System.out.println(savedInstanceState);
+
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+        try {
+            view = getActivity().getLayoutInflater().inflate(R.layout.dialog_pick_location_google, null,false);
+//            setSetting();
+        } catch (InflateException e) {
+            /* map is already there, just return view as it is */
+        }
+        if (mMap != null) {
+            System.out.println("mMap != null");
+            setSetting();
+        }
+        else {
+            System.out.println("mMap == null");
+        }
+
 
         btnPickLocation = view.findViewById(R.id.btnPickLocation);
+
 
         btnPickLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,25 +90,36 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
             }
         });
 
+        if (supportMapFragment == null) {
+            supportMapFragment = (SupportMapFragment)
+                    getActivity().getSupportFragmentManager().findFragmentById(R.id.google_map);
+        }
 
-        SupportMapFragment supportMapFragment = (SupportMapFragment)
-                getActivity().getSupportFragmentManager().findFragmentById(R.id.google_map);
 
         GoogleApiAvailability.getInstance().makeGooglePlayServicesAvailable(getActivity());
 
         supportMapFragment.getMapAsync(this);
-
+//        setSetting();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(view);
         return builder.create();
     }
+
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         System.out.println("onMapReady");
         System.out.println("googleMap: " + googleMap);
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        setSetting();
+
+
+    }
+
+    private void setSetting() {
+        System.out.println("setSetting is set!!");
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         //set map to a location and zoom in
         float zoomLevel = 6.0f;
         GPSTracker gpsTrackerr = new GPSTracker(getActivity());
@@ -116,8 +153,6 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
             System.out.println("longitude: " + longitude);
             System.out.println("latitude: " + latitude);
         }
-
-
     }
 
     @Override
@@ -152,6 +187,17 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+//        mMap.clear();
+//        supportMapFragment.onDestroy();
+//        supportMapFragment.onDestroyView();
 
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
 }

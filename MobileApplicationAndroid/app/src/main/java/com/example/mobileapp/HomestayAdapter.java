@@ -89,6 +89,7 @@ public class HomestayAdapter extends RecyclerView.Adapter<HomestayAdapter.ViewHo
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+
                                 dataSnapshot.getRef().child("availability").setValue(true);
                             }
                         }

@@ -1,38 +1,46 @@
 package com.example.mobileapp;
 
+import android.util.Log;
+
+import com.google.firebase.functions.FirebaseFunctions;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class Utils {
-//    public static GeoCoordinate GetCentralGeoCoordinate(
-//            IList<GeoCoordinate> geoCoordinates)
-//    {
-//        if (geoCoordinates.Count == 1)
-//        {
-//            return geoCoordinates.Single();
-//        }
-//
-//        double x = 0;
-//        double y = 0;
-//        double z = 0;
-//
-//        foreach (var geoCoordinate in geoCoordinates)
-//        {
-//            var latitude = geoCoordinate.Latitude * Math.PI / 180;
-//            var longitude = geoCoordinate.Longitude * Math.PI / 180;
-//
-//            x += Math.Cos(latitude) * Math.Cos(longitude);
-//            y += Math.Cos(latitude) * Math.Sin(longitude);
-//            z += Math.Sin(latitude);
-//        }
-//
-//        var total = geoCoordinates.Count;
-//
-//        x = x / total;
-//        y = y / total;
-//        z = z / total;
-//
-//        var centralLongitude = Math.Atan2(y, x);
-//        var centralSquareRoot = Math.Sqrt(x * x + y * y);
-//        var centralLatitude = Math.Atan2(z, centralSquareRoot);
-//
-//        return new GeoCoordinate(centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI);
-//    }
+    private static final String TAG = "Utils";
+
+    public static void getTokens() {
+        FirebaseFunctions firebaseFunctions = FirebaseFunctions.getInstance();
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", "IR58DT89l0at22J0bXgg9uzU9av2");
+
+        firebaseFunctions
+                .getHttpsCallable("getFCMToken")
+                .call(data)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Map<String, Object> result = (Map<String, Object>) task.getResult().getData();
+                        String token = (String) result.get("token");
+                        if (token != null) {
+                            System.out.println("______________________________");
+                            System.out.println("______________________________");
+                            System.out.println("______________________________");
+                            System.out.println("______________________________");
+                            System.out.println("Token: " + token);
+                            System.out.println("______________________________");
+                            System.out.println("______________________________");
+                            System.out.println("______________________________");
+                            System.out.println("______________________________");
+                            // Use the FCM token here
+                        } else {
+                            String error = (String) result.get("error");
+                            Log.e(TAG, "Error getting FCM token: " + error);
+                        }
+                    } else {
+                        Exception e = task.getException();
+                        Log.e(TAG, "Error calling Cloud Function: " + e.getMessage());
+                    }
+                });
+    }
 }

@@ -1,8 +1,12 @@
 package com.example.mobileapp;
 
 
+
+
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import android.view.View;
@@ -26,6 +30,7 @@ import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClic
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 public class SearchHomestayFiltersFragment extends DialogFragment {
 
@@ -51,9 +56,16 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Locale locale = new Locale("tg"); // replace "fr" with the desired language code
+        Resources res = getResources();
+        Configuration config = new Configuration(res.getConfiguration());
+        config.setLocale(locale);
+        Context context = getActivity().createConfigurationContext(config);
         View view = getActivity().getLayoutInflater().inflate(R.layout.search_homestay_filters, null,false);
         init(view);
         initListerners();
+
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
                 .setView(view);

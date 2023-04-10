@@ -1,30 +1,23 @@
 package com.example.mobileapp;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DataSnapshot;
@@ -65,8 +58,7 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
 
 //        setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 
         SupportMapFragment supportMapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.google_map);
@@ -80,17 +72,16 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
         homestaysRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                LatLngBounds.Builder bc = new LatLngBounds.Builder();
+                if (myLocation != null) {
+                    bc.include(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+                }
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Homestay homestay = dataSnapshot.getValue(Homestay.class);
-//                    homestaysList.add(homestay);
-                    System.out.println(homestay.getHomestayName());
-                    System.out.println("___________________________");
-                    System.out.println("___________________________");
-                    System.out.println("Distance");
-                    System.out.println(myLocation);
-                    System.out.println(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K'));
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()))).title(homestay.getHomestayName()).snippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K') + "km")).setTag(homestay.getId() + "," + homestay.getOwnerId());
+                    bc.include(new LatLng(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude())));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()))).title(homestay.getHomestayName()).snippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km")).setTag(homestay.getId() + "," + homestay.getOwnerId() + "," + homestay.getHomestayName());
                 }
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 100));
             }
 
             @Override
@@ -117,6 +108,7 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
                         break;
                     case R.id.viewBookings:
                         System.out.println("Bookings");
+                        startActivity(new android.content.Intent(CustomerHome.this, CustomerBookings.class));
                         break;
                     default:
                         break;
@@ -126,25 +118,38 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
-
-
     }
 
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         float zoomLevel = 6.0f;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(38.861034, 71.27609299999995), zoomLevel));
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(@NonNull Marker marker) {
+//                System.out.println("Marker Clicked");
+//                System.out.println(marker.getTitle());
+//                System.out.println(marker.getSnippet());
+//                System.out.println("TAg: " + marker.getTag());
+//                Bundle bundle = new Bundle();
+//                bundle.putString("homestay", (String) marker.getTag());
+//                BookingFragement dialog = new BookingFragement();
+//                dialog.setArguments(bundle);
+//                dialog.show(getSupportFragmentManager(), "pick location");
+//                return false;
+//            }
+//        });
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
-            public boolean onMarkerClick(@NonNull Marker marker) {
-                System.out.println("Marker Clicked");
+            public void onInfoWindowClick(@NonNull Marker marker) {
+                System.out.println("Info Window Clicked");
                 System.out.println(marker.getTitle());
                 System.out.println(marker.getSnippet());
                 System.out.println("TAg: " + marker.getTag());
@@ -153,7 +158,6 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
                 BookingFragement dialog = new BookingFragement();
                 dialog.setArguments(bundle);
                 dialog.show(getSupportFragmentManager(), "pick location");
-                return false;
             }
         });
 
@@ -164,7 +168,7 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
             Location myLocationn = gpsTrackerr.getLocation();
             double clon = myLocationn.getLongitude();
             double clat = myLocationn.getLatitude();
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(clat,clon), zoomLevel));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(clat, clon), zoomLevel));
             mMap.addMarker(new MarkerOptions().position(new LatLng(clat, clon)).title("Current Location")).
                     setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
 
@@ -173,31 +177,6 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-
-
-
-    private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
-        // below line is use to generate a drawable.
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-
-        // below line is use to set bounds to our vector drawable.
-        assert vectorDrawable != null;
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-
-        // below line is use to create a bitmap for our
-        // drawable which we have added.
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-
-        // below line is use to add bitmap in our canvas.
-        Canvas canvas = new Canvas(bitmap);
-
-        // below line is use to draw our
-        // vector drawable in canvas.
-        vectorDrawable.draw(canvas);
-
-        // after generating our bitmap we are returning our bitmap.
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
 
     @Override
     public void sendInput(String checkIn, String checkOut, String address, String searchBy, String distance) {
@@ -223,20 +202,24 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
             searchByDistance(distance);
         }
 
-        System.out.println("Urrrrrraaaaaa");
+
     }
 
     private void searchByDistance(String distance) {
         homestaysRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                LatLngBounds.Builder bc = new LatLngBounds.Builder();
+                bc.include(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Homestay homestay = dataSnapshot.getValue(Homestay.class);
                     if (DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K') <= Double.valueOf(distance)) {
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()))).title(homestay.getHomestayName()).snippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K') + "km")).setTag(homestay.getId() + "," + homestay.getOwnerId());;
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()))).title(homestay.getHomestayName()).snippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K') + "km")).setTag(homestay.getId() + "," + homestay.getOwnerId() + "," + homestay.getHomestayName());
+                        bc.include(new LatLng(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude())));
 
                     }
                 }
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bc.build(), 100));
             }
 
             @Override
@@ -277,7 +260,7 @@ public class CustomerHome extends AppCompatActivity implements OnMapReadyCallbac
                     System.out.println("Distance");
                     System.out.println(myLocation);
                     System.out.println(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K'));
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()))).title(homestay.getHomestayName()).snippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K') + "km")).setTag(homestay.getId() + "," + homestay.getOwnerId());;
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()))).title(homestay.getHomestayName()).snippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.valueOf(homestay.getLatitude()), Double.valueOf(homestay.getLongitude()), 'K') + "km")).setTag(homestay.getId() + "," + homestay.getOwnerId() + "," + homestay.getHomestayName());
                 }
             }
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Дархости манзил</string>
+    <string name="title_activity_maps">Ном дар харита</string>
+    <string-array name="spinnerItems">
+        <item>Кишлок</item>
+        <item>Куча</item>
+        <item>Нохия</item>
+        <item>Шахр</item>
+    </string-array>
+    <string name="customer_guide_text">Истифода ҳамчун мизочон. Инчо метавонед мехмонхонахона ёфтан.</string>
+    <string name="owner_guide_text">ин бахш барои соҳиби меҳмонхонаҳо. Инҷо метавонед меҳмонхонаатонро идора намудан</string>
+    <string name="booking_home_button_text">Сабт</string>
+    <string name="manage_home_button_text">Идора</string>
+    <string name="language">Забонҳо</string>
+    <string name="tajik">Тоҷики</string>
+    <string name="english">Англиси</string>
+</resources>

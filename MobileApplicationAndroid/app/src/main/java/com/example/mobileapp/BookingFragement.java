@@ -21,8 +21,12 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -39,6 +43,7 @@ public class BookingFragement extends DialogFragment {
     private String checkOutDateStr;
 
     private String homestayID = "";
+    private String homestayName = "";
     private String ownerID = "";
     private DatabaseReference myRef;
 
@@ -57,10 +62,12 @@ public class BookingFragement extends DialogFragment {
         if (bundle != null) {
             String args = bundle.getString("homestay");
             if (args != null) {
+                System.out.println(args);
                 List<String> items = Arrays.asList(args.split("\\s*,\\s*"));
                 System.out.println(items.toString());
                 homestayID = items.get(0);
                 ownerID = items.get(1);
+                homestayName = items.get(2);
             }
 
         }
@@ -114,10 +121,31 @@ public class BookingFragement extends DialogFragment {
                 String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 String userName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
                 String comment = comments.getText().toString();
-
-                Booking booking = new Booking(checkInDateStr,checkOutDateStr,userName,userID,homestayID,ownerID);
+                Booking booking = new Booking(checkInDateStr,checkOutDateStr,userName,userID,homestayID,homestayName,ownerID);
                 myRef.child("booking").push().setValue(booking);
 
+                // get the token of the owner
+                DatabaseReference tokenRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
+                Query query = tokenRef.orderByChild("ownerID").equalTo(ownerID);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String token = dataSnapshot.child("token").getValue(String.class);
+                            System.out.println(token);
+                            // send notification to the owner
+                            String title = "New Booking";
+                            String body = "You have a new booking for " + homestayName;
+
+                            NotificationManagerHelper.sendNotification(token,title,body);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
                 Toast.makeText(getActivity(), "Booking Successful", Toast.LENGTH_SHORT).show();
                 dismiss();
 

@@ -1,5 +1,6 @@
 package com.example.mobileapp;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 public class Booking {
@@ -8,25 +9,39 @@ public class Booking {
     private String checkOutDate;
     private String nameBookedBy;
     private String homestayID;
+    private String homestayName;
     private String userID;
     private String ownerID;
     private boolean booked;
     private boolean rejected;
     private boolean isCancelled;
 
+    private long timestampLong;
     public Booking() {
     }
-    public Booking( String checkInDate, String checkOutDate, String nameBookedBy,  String userID,String homestayID, String ownerID) {
+    public Booking( String checkInDate, String checkOutDate, String nameBookedBy,  String userID,String homestayID,String homestayName, String ownerID) {
         this.bookingID = UUID.randomUUID().toString();
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.userID = userID;
+        this.homestayName = homestayName;
         this.homestayID = homestayID;
         this.ownerID = ownerID;
         this.booked = false;
         this.rejected = false;
         this.nameBookedBy = nameBookedBy;
         this.isCancelled = false;
+
+        this.timestampLong = (new Timestamp(System.currentTimeMillis())).getTime();
+
+    }
+
+    public void setTimestampLong(long timestampLong) {
+        this.timestampLong = timestampLong;
+    }
+
+    public long getTimestampLong() {
+        return timestampLong;
     }
 
     public boolean isCancelled() {
@@ -107,5 +122,13 @@ public class Booking {
 
     public void setBooked(boolean booked) {
         this.booked = booked;
+    }
+
+    public String getHomestayName() {
+        return homestayName;
+    }
+
+    public void setHomestayName(String homestayName) {
+        this.homestayName = homestayName;
     }
 }

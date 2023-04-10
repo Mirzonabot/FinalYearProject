@@ -44,14 +44,14 @@ public class BookingProviderAdopter extends RecyclerView.Adapter<BookingProvider
         Booking booking = bookingList.get(position);
         System.out.println(booking.getCheckInDate());
         System.out.println("urreeee1111");
-        holder.checkInDate.setText(booking.getCheckInDate());
-        holder.checkOutDate.setText(booking.getCheckOutDate());
+        holder.checkInDate.setText("Check-in: "+booking.getCheckInDate());
+        holder.checkOutDate.setText("Check-out: " + booking.getCheckOutDate());
 
-        if (booking.isBooked() == true) {
+        if (booking.isBooked()) {
             holder.acceptBooking.setVisibility(View.GONE);
             holder.rejectBooking.setVisibility(View.GONE);
             holder.cancelBooking.setVisibility(View.VISIBLE);
-            if (booking.isCancelled() == false) {
+            if (!booking.isCancelled()) {
                 holder.cancelBooking.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -61,6 +61,26 @@ public class BookingProviderAdopter extends RecyclerView.Adapter<BookingProvider
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                     dataSnapshot.getRef().child("cancelled").setValue(true);
+                                    DatabaseReference tokenRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
+                                    Query query = tokenRef.orderByChild("userID").equalTo(booking.getUserID());
+                                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String token = dataSnapshot.child("token").getValue(String.class);
+                                                System.out.println(token);
+                                                // send notification to the owner
+                                                String title = "Booking Cancelled";
+                                                String body = "cancelled booking at " + booking.getHomestayName();
+
+                                                NotificationManagerHelper.sendNotification(token,title,body);
+                                            }
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                 }
                             }
 
@@ -101,6 +121,27 @@ public class BookingProviderAdopter extends RecyclerView.Adapter<BookingProvider
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             dataSnapshot.getRef().child("booked").setValue(true);
+                            DatabaseReference tokenRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
+                            Query query = tokenRef.orderByChild("userID").equalTo(booking.getUserID());
+                            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                        String token = dataSnapshot.child("token").getValue(String.class);
+                                        System.out.println(token);
+                                        // send notification to the owner
+                                        String title = "Booking accepted";
+                                        String body = "Accepted booking for " + booking.getHomestayName();
+
+                                        NotificationManagerHelper.sendNotification(token,title,body);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                         }
                     }
 
@@ -121,6 +162,28 @@ public class BookingProviderAdopter extends RecyclerView.Adapter<BookingProvider
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             dataSnapshot.getRef().child("rejected").setValue(true);
+                            // notify user
+                            DatabaseReference tokenRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
+                            Query query = tokenRef.orderByChild("userID").equalTo(booking.getUserID());
+                            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                        String token = dataSnapshot.child("token").getValue(String.class);
+                                        System.out.println(token);
+                                        // send notification to the owner
+                                        String title = "Booking Rejected";
+                                        String body = "Rejected booking for " + booking.getHomestayName();
+
+                                        NotificationManagerHelper.sendNotification(token,title,body);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
                         }
                     }
 
@@ -132,7 +195,7 @@ public class BookingProviderAdopter extends RecyclerView.Adapter<BookingProvider
                 holder.acceptBooking.setEnabled(false);
             }
         });
-        holder.userName.setText(booking.getNameBookedBy());
+        holder.userName.setText("By: " + booking.getNameBookedBy());
 
     }
 
