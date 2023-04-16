@@ -3,27 +3,23 @@ package com.example.mobileapp;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.auth.FirebaseAuth;
+import org.osmdroid.tileprovider.modules.MapTileDownloader;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.tilesource.XYTileSource;
 
 import java.util.Locale;
-import java.util.Map;
-
-import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Home extends AppCompatActivity {
 
@@ -35,11 +31,23 @@ public class Home extends AppCompatActivity {
     private static final String CHANNEL_NAME = "Channel 1";
     private static final String CHANNEL_DESC = "This is Channel 1";
 
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 //        sendNotification();
+        OnlineTileSourceBase source = new XYTileSource("OpenStreetMap",4, 10,  256, ".png", new String[] {
+                "http://a.tile.openstreetmap.org/",
+                "http://b.tile.openstreetmap.org/",
+                "http://c.tile.openstreetmap.org/"});
+        MapTileDownloader downloader = new MapTileDownloader(source);
+        downloader.setTileSource(TileSourceFactory.MAPNIK);
+
+
+
         goToCustomerPage = findViewById(R.id.bookingButton);
         goToProviderPage = findViewById(R.id.goingToHomestays);
         toolbar = findViewById(R.id.toolbar);

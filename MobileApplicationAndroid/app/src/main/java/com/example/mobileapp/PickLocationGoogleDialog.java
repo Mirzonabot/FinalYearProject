@@ -38,7 +38,7 @@ public class PickLocationGoogleDialog extends DialogFragment implements OnMapRea
     public interface OnInputListener{
         void sendInput(String lat, String lon);
     }
-    private static View view;
+    private View view;
 
 
     public PickLocationGoogleDialog.OnInputListener onInputListener;

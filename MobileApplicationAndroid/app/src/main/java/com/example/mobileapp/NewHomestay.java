@@ -23,6 +23,8 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     ImageView addLocaionFromMap;
     ImageView addLocationFromGoogle;
 
+    ImageView addLocationFromOsmdroid;
+
     private String lt;
     private String ln;
 
@@ -57,6 +59,14 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
             public void onClick(View view) {
                 PickLocationGoogleDialog dialog = new PickLocationGoogleDialog();
                 dialog.show(getSupportFragmentManager(), "pick location");
+            }
+        });
+
+        addLocationFromOsmdroid.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PickLocationOsmdroid pickLocationOsmdroid = new PickLocationOsmdroid();
+                pickLocationOsmdroid.show(getSupportFragmentManager(),"pick location from osmdroid");
             }
         });
 
@@ -121,6 +131,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     private void initInputs() {
         addLocaionFromMap = (ImageView) findViewById(R.id.addLocationFromMap);
         addLocationFromGoogle = (ImageView) findViewById(R.id.addLocationFromGoogle);
+        addLocationFromOsmdroid = (ImageView) findViewById(R.id.addLocationFromOsmdroid);
         city = findViewById(R.id.city);
         district = findViewById(R.id.district);
         village = findViewById(R.id.village);

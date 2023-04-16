@@ -98,6 +98,15 @@
         app:srcCompat="@drawable/ic_baseline_add_location_24" />
 
     <ImageView
+
+        android:id="@+id/addLocationFromOsmdroid"
+        android:layout_width="44dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="50dp"
+        app:srcCompat="@drawable/ic_baseline_add_location_24"
+        android:layout_below="@+id/street"/>
+
+    <ImageView
         android:id="@+id/addLocationFromGoogle"
         android:layout_width="44dp"
         android:layout_height="46dp"
