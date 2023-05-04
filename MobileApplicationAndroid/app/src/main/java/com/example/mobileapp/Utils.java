@@ -1,5 +1,8 @@
 package com.example.mobileapp;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.Log;
 
 import com.google.firebase.functions.FirebaseFunctions;
@@ -42,5 +45,22 @@ public class Utils {
                         Log.e(TAG, "Error calling Cloud Function: " + e.getMessage());
                     }
                 });
+    }
+    public static Bitmap createCircleBitmap(int fillColor, int strokeColor, int radius) {
+        Bitmap output = Bitmap.createBitmap(radius * 2, radius * 2, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        Paint paint = new Paint();
+        paint.setColor(fillColor);
+        paint.setAntiAlias(true);
+
+        canvas.drawCircle(radius, radius, radius, paint);
+
+        paint.setColor(strokeColor);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeWidth(3);
+        canvas.drawCircle(radius, radius, radius, paint);
+
+        return output;
     }
 }

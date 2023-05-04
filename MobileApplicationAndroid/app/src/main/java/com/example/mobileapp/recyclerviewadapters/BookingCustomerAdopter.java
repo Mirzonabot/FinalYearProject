@@ -1,4 +1,4 @@
-package com.example.mobileapp;
+package com.example.mobileapp.recyclerviewadapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mobileapp.dbclasses.Booking;
+import com.example.mobileapp.NotificationManagerHelper;
+import com.example.mobileapp.R;
+import com.example.mobileapp.memorymanager.SqlHelper;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,11 +28,13 @@ public class BookingCustomerAdopter extends RecyclerView.Adapter<BookingCustomer
     private Context mContext;
     private ArrayList<Booking> bookingList;
     private DatabaseReference databaseReference;
+    private SqlHelper sqlHelper;
 
     public BookingCustomerAdopter(Context mContext, ArrayList<Booking> bookingList) {
         this.mContext = mContext;
         this.bookingList = bookingList;
         this.databaseReference = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("booking");
+        sqlHelper = new SqlHelper(mContext);
         System.out.println("urreeee");
     }
 
@@ -53,6 +59,7 @@ public class BookingCustomerAdopter extends RecyclerView.Adapter<BookingCustomer
             holder.statusBooking.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    sqlHelper.cancelMyBookingInOtherHomestays(booking.getBookingID());
                     Query query = databaseReference.orderByChild("bookingID").equalTo(booking.getBookingID());
                     query.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -72,7 +79,7 @@ public class BookingCustomerAdopter extends RecyclerView.Adapter<BookingCustomer
                                             String title = "Booking cancelled";
                                             String body = "Cancelled booking for " + booking.getHomestayName();
 
-                                            NotificationManagerHelper.sendNotification(token,title,body);
+                                            NotificationManagerHelper.sendNotification(token,title,body,"cancelledByCustomer",booking.getBookingID());
                                         }
                                     }
 

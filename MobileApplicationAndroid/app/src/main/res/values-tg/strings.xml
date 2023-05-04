@@ -15,4 +15,10 @@
     <string name="language">Забонҳо</string>
     <string name="tajik">Тоҷики</string>
     <string name="english">Англиси</string>
+    <string name="download_map">Бор кардан</string>
+    <string name="language_string">Language</string>
+    <string name="internet_string">Internet</string>
+    <string name="homestays">HomeStays</string>
+    <string name="bookings_string">Bookings</string>
+    <string name="search_homestays">Search Homestays</string>
 </resources>

@@ -1,9 +1,7 @@
-package com.example.mobileapp;
+package com.example.mobileapp.homepages;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,17 +9,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
+import com.example.mobileapp.dbclasses.Homestay;
+import com.example.mobileapp.NewHomestay;
+import com.example.mobileapp.ProviderBookings;
+import com.example.mobileapp.R;
+import com.example.mobileapp.memorymanager.SharedPreferences;
+import com.example.mobileapp.memorymanager.SqlHelper;
+import com.example.mobileapp.recyclerviewadapters.HomestayAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
@@ -64,39 +65,48 @@ public class ProviderHome extends AppCompatActivity {
             startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
         }
 
+        if(SharedPreferences.isInternetAvailable(this)) {
+            FirebaseApp.initializeApp(this);
+            DatabaseReference homestaysRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("homestays");
+            String ownerID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        FirebaseApp.initializeApp(this);
-        DatabaseReference homestaysRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("homestays");
-        String ownerID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            Query query = homestaysRef.orderByChild("ownerId").equalTo(ownerID);
+            query.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-        Query query = homestaysRef.orderByChild("ownerId").equalTo(ownerID);
-        query.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    homestaysList.clear();
 
-                homestaysList.clear();
-
-                for (DataSnapshot homestaySnapshot : dataSnapshot.getChildren()) {
-                    Homestay homestay = homestaySnapshot.getValue(Homestay.class);
-                    // Do something with the book object
-                    homestaysList.add(homestay);
+                    for (DataSnapshot homestaySnapshot : dataSnapshot.getChildren()) {
+                        Homestay homestay = homestaySnapshot.getValue(Homestay.class);
+                        // Do something with the book object
+                        homestaysList.add(homestay);
+                    }
+                    if (homestaysList.size() == 0) {
+                        relativeLayout.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                    } else {
+                        relativeLayout.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                    }
+                    homestayAdapter.setHomestayList(homestaysList);
                 }
-                if (homestaysList.size() == 0) {
-                    relativeLayout.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                } else {
-                    relativeLayout.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle any errors here
                 }
-                homestayAdapter.setHomestayList(homestaysList);
-            }
+            });
+            homestayAdapter = new HomestayAdapter(this, homestaysList);
+            recyclerView.setAdapter(homestayAdapter);
+        }
+        else {
+            SqlHelper sqlHelper = new SqlHelper(this);
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle any errors here
-            }
-        });
-
+            ArrayList<Homestay> homestays = sqlHelper.getAllHomestays();
+            homestayAdapter = new HomestayAdapter(this, homestays);
+            recyclerView.setAdapter(homestayAdapter);
+        }
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -116,8 +126,7 @@ public class ProviderHome extends AppCompatActivity {
 
 
 
-        homestayAdapter = new HomestayAdapter(this, homestaysList);
-        recyclerView.setAdapter(homestayAdapter);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Get the location manager

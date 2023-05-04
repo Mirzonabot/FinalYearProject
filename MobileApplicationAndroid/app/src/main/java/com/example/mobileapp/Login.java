@@ -3,7 +3,6 @@ package com.example.mobileapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -15,13 +14,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mobileapp.dbclasses.TokenUserID;
+import com.example.mobileapp.homepages.Home;
+import com.example.mobileapp.memorymanager.SharedPreferences;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -33,7 +34,6 @@ public class Login extends AppCompatActivity {
     ProgressBar progressBar;
     FirebaseAuth fAuth;
     Button btnLogin, btnLoginGoogle, forgotPassword;
-    GoogleSignInOptions gso;
 
     // email validation pattern
     String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
@@ -113,7 +113,6 @@ public class Login extends AppCompatActivity {
     private void saveToken() {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-
         if (currentUser != null) {
             FirebaseInstanceId.getInstance().getInstanceId()
                             .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
@@ -124,17 +123,7 @@ public class Login extends AppCompatActivity {
                                         return;
                                     }
 
-                                    // Get new Instance ID token
                                     String token = task.getResult().getToken();
-                                    System.out.println("_________________________");
-                                    System.out.println("_________________________");
-                                    System.out.println("_________________________");
-                                    System.out.println("_________________________");
-                                    System.out.println("token: " + token);  // Log
-                                    System.out.println("_________________________");
-                                    System.out.println("_________________________");
-                                    System.out.println("_________________________");
-                                    System.out.println("_________________________");
                                     if (task.isSuccessful()) {
 //                                        String s = task.getResult().getToken();
 
@@ -143,28 +132,20 @@ public class Login extends AppCompatActivity {
                                         DatabaseReference myRef = database.getReference(TOKENS_NODE);
                                         String userId = FirebaseAuth.getInstance().getUid();
 
-                                        TokenUserID tokenUserID = new TokenUserID(token, userId);
-                                        System.out.println("_________________________");
-                                        System.out.println("_________________________");
-                                        System.out.println("_________________________");
-                                        System.out.println("_________________________");
-                                        System.out.println("tokenUserID: " + tokenUserID);  // Log
-                                        System.out.println("_________________________");
-                                        System.out.println("_________________________");
-                                        System.out.println("_________________________");
-                                        System.out.println("_________________________");
-                                        myRef.child(userId).setValue(tokenUserID).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        myRef.child(userId).child("token").setValue(token);
+
+                                        myRef.child(userId).child("userPhoneNumber").addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                                             @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Toast.makeText(Login.this, "Token saved", Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    Toast.makeText(Login.this, "Token not saved", Toast.LENGTH_SHORT).show();
-                                                }
+                                            public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                                                String userPhoneNumber = snapshot.getValue(String.class);
+                                                SharedPreferences.setPhoneNumber(Login.this, userPhoneNumber);
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
+
                                             }
                                         });
-                                    } else {
-                                        // Handle error getting token ID
                                     }
                                 }
                             });
@@ -180,6 +161,6 @@ public class Login extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         onDestroy();
-        onDestroy();
+
     }
 }

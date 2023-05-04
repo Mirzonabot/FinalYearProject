@@ -1,4 +1,4 @@
-package com.example.mobileapp;
+package com.example.mobileapp.fragments;
 
 import android.app.Dialog;
 import android.os.Bundle;
@@ -15,6 +15,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.mobileapp.dbclasses.Booking;
+import com.example.mobileapp.NotificationManagerHelper;
+import com.example.mobileapp.R;
+import com.example.mobileapp.dbclasses.Homestay;
+import com.example.mobileapp.memorymanager.SharedPreferences;
+import com.example.mobileapp.memorymanager.SqlHelper;
+import com.example.mobileapp.smsmanager.SMSSender;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -45,7 +52,10 @@ public class BookingFragement extends DialogFragment {
     private String homestayID = "";
     private String homestayName = "";
     private String ownerID = "";
+    private String bookerPhoneNumber = null;
+    private String homestayOwnerPhoneNumber = null;
     private DatabaseReference myRef;
+    private SqlHelper sqlHelper;
 
     @NonNull
     @Override
@@ -68,6 +78,7 @@ public class BookingFragement extends DialogFragment {
                 homestayID = items.get(0);
                 ownerID = items.get(1);
                 homestayName = items.get(2);
+                homestayOwnerPhoneNumber = items.get(3);
             }
 
         }
@@ -82,6 +93,7 @@ public class BookingFragement extends DialogFragment {
     }
 
     private void initListners() {
+        sqlHelper  = new SqlHelper(getActivity());
         dateRange.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -121,31 +133,60 @@ public class BookingFragement extends DialogFragment {
                 String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 String userName = FirebaseAuth.getInstance().getCurrentUser().getDisplayName();
                 String comment = comments.getText().toString();
-                Booking booking = new Booking(checkInDateStr,checkOutDateStr,userName,userID,homestayID,homestayName,ownerID);
-                myRef.child("booking").push().setValue(booking);
+                Booking booking = new Booking(checkInDateStr,checkOutDateStr,userName,userID,homestayID,homestayName,ownerID,SharedPreferences.getPhoneNumber(getContext()),homestayOwnerPhoneNumber);
+                sqlHelper.createMyBooking(booking);
+                if (SharedPreferences.isInternetAvailable(getContext())) {
+                    myRef.child("booking").push().setValue(booking);
+                    DatabaseReference tokenRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
+                    Query query = tokenRef.orderByChild("userID").equalTo(booking.getOwnerID());
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                String token = dataSnapshot.child("token").getValue(String.class);
+                                System.out.println(token);
+                                // send notification to the owner
+                                String title = "Booking request";
+                                String body = "You have a new request at " + booking.getHomestayName();
 
-                // get the token of the owner
-                DatabaseReference tokenRef = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
-                Query query = tokenRef.orderByChild("ownerID").equalTo(ownerID);
-                query.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            String token = dataSnapshot.child("token").getValue(String.class);
-                            System.out.println(token);
-                            // send notification to the owner
-                            String title = "New Booking";
-                            String body = "You have a new booking for " + homestayName;
-
-                            NotificationManagerHelper.sendNotification(token,title,body);
+                                NotificationManagerHelper.sendNotification(token, title, body,"newBooking",booking.getBookingID());
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
 
-                    }
-                });
+                        }
+                    });
+
+
+                    // get the token of the owner
+                    DatabaseReference tokenRef1 = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("tokenUserID");
+                    Query query1 = tokenRef1.orderByChild("ownerID").equalTo(ownerID);
+                    query1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                String token = dataSnapshot.child("token").getValue(String.class);
+                                System.out.println(token);
+                                // send notification to the owner
+                                String title = "New Booking";
+                                String body = "You have a new booking for " + homestayName;
+                                NotificationManagerHelper.sendNotification(token, title, body,"newBooking",booking.getBookingID());
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
+                else {
+                    Homestay homestay = sqlHelper.getOfflineHomestayById(booking.getHomestayID());
+                    SMSSender.smsNewBooking(booking,homestay);
+                }
                 Toast.makeText(getActivity(), "Booking Successful", Toast.LENGTH_SHORT).show();
                 dismiss();
 

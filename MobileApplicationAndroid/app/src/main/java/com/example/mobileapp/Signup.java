@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -15,12 +14,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mobileapp.dbclasses.TokenUserID;
+import com.example.mobileapp.homepages.Home;
+import com.example.mobileapp.memorymanager.SharedPreferences;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 
 public class Signup extends AppCompatActivity {
 
@@ -127,10 +133,45 @@ public class Signup extends AppCompatActivity {
                                         }
                                     });
 
+                            FirebaseDatabase database = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app");
+
+                            DatabaseReference myRef = database.getReference("tokenUserID");
+
+                            FirebaseInstanceId.getInstance().getInstanceId()
+                                    .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                            if (!task.isSuccessful()) {
+                                                System.out.println("getInstanceId failed " + task.getException());
+                                                return;
+                                            }
+
+                                            if (task.isSuccessful()) {
+                                                String token = task.getResult().getToken();
+
+
+                                                TokenUserID tokenUserID = new TokenUserID(user1.getUid(),user1.getDisplayName(),user1.getEmail(),mphoneNumber.getText().toString(),token);
+                                                SharedPreferences.setPhoneNumber(Signup.this,mphoneNumber.getText().toString());
+//                                                myRef.child("tokenUserID").push().setValue();
+                                                myRef.child(user1.getUid()).setValue(tokenUserID).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            Toast.makeText(Signup.this, "Token saved", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(Signup.this, "Token not saved", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                // Handle error getting token ID
+                                            }
+                                        }
+                                    });
                             System.out.println("you are in 7");
                             Toast.makeText(Signup.this,"User created!",Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
-                            startActivity(new Intent(getApplicationContext(),Home.class));
+                            startActivity(new Intent(getApplicationContext(), Home.class));
                         }else {
                             System.out.println("you are in 8");
                             Toast.makeText(Signup.this,"error!"+task.getException().getLocalizedMessage(),Toast.LENGTH_SHORT).show();

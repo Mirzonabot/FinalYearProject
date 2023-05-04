@@ -6,11 +6,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <application
         android:allowBackup="true"
@@ -18,11 +21,18 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@drawable/homestay"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+        <activity
+            android:name=".SampleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MapDownloader"
+            android:exported="false" />
         <activity
             android:name=".CustomerBookings"
             android:exported="false" />
@@ -70,7 +80,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".ProviderHome"
+            android:name=".homepages.ProviderHome"
             android:exported="false"
             android:label=""
             android:theme="@style/Theme.MobileApp.NoActionBar">
@@ -79,7 +89,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".CustomerHome"
+            android:name=".homepages.CustomerHome"
             android:exported="false"
             android:theme="@style/Theme.MobileApp.NoActionBar">
             <meta-data
@@ -87,10 +97,9 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".Home"
+            android:name=".homepages.Home"
             android:exported="false"
-            android:theme="@style/Theme.MobileApp.NoActionBar"
-            >
+            android:theme="@style/Theme.MobileApp.NoActionBar">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -127,12 +136,12 @@
             android:name=".PushNotificationService"
             android:exported="false">
             <intent-filter>
-                <action
-                    android:name="com.google.firebase.MESSAGING_EVENT">
-                </action>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <receiver android:name=".SmsListener"
+
+        <receiver
+            android:name=".smsmanager.SmsListener"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />

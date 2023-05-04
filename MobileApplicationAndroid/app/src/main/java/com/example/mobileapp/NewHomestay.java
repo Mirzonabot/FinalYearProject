@@ -9,16 +9,27 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.mobileapp.dbclasses.Homestay;
+import com.example.mobileapp.dbclasses.TokenUserID;
+import com.example.mobileapp.fragments.PickLocationDialog;
+import com.example.mobileapp.fragments.PickLocationGoogleDialog;
+import com.example.mobileapp.fragments.PickLocationOsmdroid;
+import com.example.mobileapp.homepages.ProviderHome;
+import com.example.mobileapp.memorymanager.SqlHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.yandex.mapkit.MapKitFactory;
 
 
-public class NewHomestay extends AppCompatActivity implements PickLocationDialog.OnInputListener, PickLocationGoogleDialog.OnInputListener {
+public class NewHomestay extends AppCompatActivity implements PickLocationDialog.OnInputListener, PickLocationGoogleDialog.OnInputListener, PickLocationOsmdroid.OnInputListener{
 
     ImageView addLocaionFromMap;
     ImageView addLocationFromGoogle;
@@ -33,6 +44,11 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     private EditText homeStayCapacity;
 
     private Button addHomestay;
+    private SqlHelper sqlHelper;
+
+    // Create a GestureDetector object
+
+
 
 
     @Override
@@ -40,6 +56,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         super.onCreate(savedInstanceState);
         MapKitFactory.setApiKey("69044d6e-9641-4c53-8d74-897fb9363d17");
         setContentView(R.layout.activity_new_homestay);
+        sqlHelper = new SqlHelper(this);
 //        getSupportActionBar().hide();
         initInputs();
         initListeners();
@@ -83,6 +100,25 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         System.out.println("Database reference: " + myRef);
 
 
+        final String[] ownerPhoneNumber = {null};
+        database.getReference("tokenUserID").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                        TokenUserID tokenUserID = dataSnapshot.getValue(TokenUserID.class);
+                        ownerPhoneNumber[0] = tokenUserID.getUserPhoneNumber();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
         addHomestay.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -94,6 +130,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 String street = String.valueOf(NewHomestay.this.street.getText());
                 String homestayAddress = city + ", " + district + ", " + village + ", " + street;
                 int homestayCapacity = 0;
+                String ownerID = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
 
 
@@ -109,14 +146,16 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 }
                 String homestayLatitude = lt;
                 String homestayLongitude = ln;
-                String ownerID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
 
                 if (homestayName.isEmpty() || homestayAddress.isEmpty() || String.valueOf(homeStayCapacity.getText()).isEmpty() || homestayLatitude.isEmpty() || homestayLongitude.isEmpty()) {
                     Toast.makeText(NewHomestay.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
-                    Homestay homestay = new Homestay(homestayName, homestayCapacity, ownerID, homestayAddress, homestayLatitude, homestayLongitude,village,street,district,city);
+                    Homestay homestay = new Homestay(homestayName, homestayCapacity, ownerID, homestayAddress, homestayLatitude, homestayLongitude,village,street,district,city,ownerPhoneNumber[0]);
+                    sqlHelper.addHomestay(homestay);
 //                    myRef.child("homestays");
+
                     myRef.child("homestays").push().setValue(homestay);
                     Toast.makeText(NewHomestay.this, "Homestay added", Toast.LENGTH_SHORT).show();
                 }

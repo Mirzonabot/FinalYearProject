@@ -1,23 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <item
-        android:id="@+id/en"
-        android:title="@string/english"
-        android:checkable="true"
-        android:checkableBehavior="single" />
+        android:id="@+id/languge_options"
+        android:title="@string/language_string"
+        app:actionLayout="@layout/toggle_button_languages"
+        app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/tj"
-        android:title="@string/tajik"
-        android:checkable="true"
-        android:checkableBehavior="single" />
+        android:id="@+id/buyer_seller_options"
+        android:title="@string/buyer_seller_string"
+        app:actionLayout="@layout/toggle_buyer_seller"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/internet_access"
+        android:title="@string/internet_string"
+        app:actionLayout="@layout/navigation_menu_switch"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/dark_mode"
+        android:title="@string/dark_mode_string"
+        app:actionLayout="@layout/navigation_menu_switch"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/logout"
         android:title="@string/logout"
-         />
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/version"
+        android:title="Version.1.0.0"
+        />
+
 
 
 

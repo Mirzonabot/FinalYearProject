@@ -1,23 +1,22 @@
-package com.example.mobileapp;
+package com.example.mobileapp.recyclerviewadapters;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.mobileapp.dbclasses.Homestay;
+import com.example.mobileapp.HomestayCalender;
+import com.example.mobileapp.R;
+import com.example.mobileapp.fragments.ViewOnMap;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,8 +25,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 
 public class HomestayAdapter extends RecyclerView.Adapter<HomestayAdapter.ViewHolder> {
 

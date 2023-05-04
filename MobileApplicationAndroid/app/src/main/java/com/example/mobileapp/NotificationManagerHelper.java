@@ -51,7 +51,7 @@ public class NotificationManagerHelper {
         notificationManager.notify(1, mBuilder.build());
     }
 
-    public static void sendNotification(String token,String title,String body) {
+    public static void sendNotification(String token,String title,String body, String notificationType, String bookingID) {
         String serverKey = "AAAAuYY_Bx8:APA91bGa-die4xVla-M5xSwN29RIjVfo1GlAtjnfuDvKBYmmFNcTpkM8PZ6iwuEGyWmZhpsDdm6m3eMDINqFbKikjEhR_PJ8M5uNdZMAbrKHBtCwW9x1NL55gYQ9alvsh9lfh6U2Jstg";
         String fcmUrl = "https://fcm.googleapis.com/";
 
@@ -61,9 +61,9 @@ public class NotificationManagerHelper {
                 .build();
 
         FcmApi fcmApi = retrofit.create(FcmApi.class);
-
+        DataPayload dataPayload = null;
         NotificationData notificationData = new NotificationData(title, body);
-        DataPayload dataPayload = new DataPayload(Map.of("key1", "value1", "key2", "value2","key3", "value3","key4", "value4"));
+        dataPayload = new DataPayload(Map.of("notificationType", notificationType, "id", bookingID));
         NotificationRequest notificationRequest = new NotificationRequest(token, notificationData, dataPayload);
 
         Call<ResponseBody> call = fcmApi.sendNotification("application/json", "key=" + serverKey, notificationRequest);
@@ -83,4 +83,6 @@ public class NotificationManagerHelper {
             }
         });
     }
+
+
 }

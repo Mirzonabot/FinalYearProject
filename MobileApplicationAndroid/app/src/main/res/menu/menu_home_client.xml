@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/search_homestay"
+        android:title="@string/search_homestays"
+        android:icon="@drawable/ic_search_foreground"
+        />
+    <item
+        android:id="@+id/bookings_client"
+        android:title="@string/bookings_string"
+        android:icon="@drawable/baseline_bookings"
+
+        />
+</menu>

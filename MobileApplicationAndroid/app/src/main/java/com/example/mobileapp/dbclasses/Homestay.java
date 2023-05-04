@@ -1,4 +1,4 @@
-package com.example.mobileapp;
+package com.example.mobileapp.dbclasses;
 
 
 import java.util.UUID;
@@ -17,11 +17,12 @@ public class Homestay {
     private String district;
     private String city;
     private String street;
+    private String homestayPhoneNumber;
 
     public Homestay() {
     }
 
-    public Homestay(String homestayName, int homestayCapacity, String ownerId, String address, String latitude, String longitude, String village,String street, String district, String city) {
+    public Homestay(String homestayName, int homestayCapacity, String ownerId, String address, String latitude, String longitude, String village,String street, String district, String city, String homestayPhoneNumber) {
         this.id = UUID.randomUUID().toString();
         this.homestayName = homestayName;
         this.homestayCapacity = homestayCapacity;
@@ -34,7 +35,16 @@ public class Homestay {
         this.district = district;
         this.city = city;
         this.street = street;
+        this.homestayPhoneNumber = homestayPhoneNumber;
 
+    }
+
+    public String getHomestayPhoneNumber() {
+        return homestayPhoneNumber;
+    }
+
+    public void setHomestayPhoneNumber(String homestayPhoneNumber) {
+        this.homestayPhoneNumber = homestayPhoneNumber;
     }
 
     public String getId() {
