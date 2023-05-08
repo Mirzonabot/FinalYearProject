@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pickDateRange"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:layout_centerInParent="true"
-    android:id="@+id/pickDateRange"
-    android:padding="15dp"
     android:background="@drawable/rounded_corners"
-    >
+    android:orientation="vertical"
+    android:padding="15dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        >
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/textview12"
@@ -46,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text=""/>
+            android:text="" />
 
         <TextView
             android:id="@+id/textview3"
@@ -61,22 +58,22 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text=""/>
+            android:text="" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <ToggleButton
             android:id="@+id/address_toggle_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="By Address"
-            android:textOff="By Current Location"/>
+            android:textOff="By Current Location"
+            android:textOn="By Address" />
 
     </LinearLayout>
 
@@ -84,23 +81,22 @@
         android:id="@+id/address_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <Spinner
             android:id="@+id/dropdown"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:entries="@array/spinnerItems"
             android:layout_weight="1"
-            />
+            android:entries="@array/spinnerItems" />
 
         <EditText
             android:id="@+id/searchTerm"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Enter value"/>
+            android:hint="Enter value" />
 
     </LinearLayout>
 
@@ -109,12 +105,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="In the proximity (KM)"
-        android:visibility="gone"/>
-    <Button
-        android:id="@+id/search"
+        android:visibility="gone" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Search"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/load"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Load"
+            android:visibility="gone"/>
+
+        <Button
+
+            android:id="@+id/search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search" />
+    </LinearLayout>
 
 </LinearLayout>
-

@@ -1,23 +1,33 @@
 package com.example.mobileapp;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.mobileapp.dbclasses.Booking;
+import com.example.mobileapp.dbclasses.Homestay;
 import com.example.mobileapp.homepages.CustomerHome;
 import com.example.mobileapp.homepages.ProviderHome;
+import com.example.mobileapp.memorymanager.FirebaseCRUD;
 import com.example.mobileapp.memorymanager.SharedPreferences;
+
+import com.example.mobileapp.memorymanager.SqlHelper;
+import com.example.mobileapp.recyclerviewadapters.BookingCustomerAdopter;
+import com.example.mobileapp.recyclerviewadapters.BookingProviderAdopter;
+import com.example.mobileapp.recyclerviewadapters.HomestayAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -29,14 +39,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class SampleActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
@@ -46,47 +50,107 @@ public class SampleActivity extends AppCompatActivity {
     private ImageView imageViewProfile;
     private StorageReference storageReference;
     private MaterialToolbar toolbar;
-    private MenuItem logout;
+    private MenuItem logout,downloadMap;
     private MaterialButtonToggleGroup toggleGroup;
+    private GPSTracker gpsTracker;
+    private SwitchCompat intSwitch;
+    private RecyclerView recyclerViewHomestays;
+    private RecyclerView recyclerViewBookings;
 
-    private GPSTracker gpsTracker = new GPSTracker(this);
-
+    private HomestayAdapter homestayAdapter;
+    private BookingProviderAdopter bookingAdapterProvider;
+    private BookingCustomerAdopter bookingAdapterCustomer;
+    private SqlHelper sqlHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample);
 
-        SharedPreferences.configureInternet(this);
-
-        init();
+        initViews();
         setSupportActionBar(toolbar);
+        setupDrawerAndToggle();
+        checkInternetConnection();
+        setupLogoutMenuItem();
+        setupDownloadMapMenuItem();
+        setupProfileImageClickListener();
+        setupBottomNavigationView();
+        setupToggleGroup();
+        setupInternetSwitch();
+        getLocation();
+    }
 
+    private void setupDownloadMapMenuItem() {
+        downloadMap.setOnMenuItemClickListener(item -> {
+            startActivity(new Intent(SampleActivity.this, MapDownloader.class));
+            return true;
+        });
+    }
 
+    private void initViews() {
+        toolbar = findViewById(R.id.toolbar);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        imageViewProfile = navigationView.getHeaderView(0).findViewById(R.id.profile_image);
+        logout = navigationView.getMenu().findItem(R.id.logout);
+        downloadMap = navigationView.getMenu().findItem(R.id.downloadMap);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        MenuItem menuItemToggle = navigationView.getMenu().findItem(R.id.buyer_seller_options);
+        toggleGroup = (MaterialButtonToggleGroup) menuItemToggle.getActionView().findViewById(R.id.toggle_button_buyer_seller);
+        intSwitch = navigationView.getMenu().findItem(R.id.internet_access).getActionView().findViewById(R.id.toggle_switch);
+        storageReference = FirebaseStorage.getInstance("gs://homestaybooking-f8308.appspot.com/").getReference("images/profiles");
+        gpsTracker = new GPSTracker(this);
+        recyclerViewHomestays = findViewById(R.id.recycler_view_homestays);
+        recyclerViewBookings = findViewById(R.id.recycler_view_bookings);
+        homestayAdapter = new HomestayAdapter(this, null);
+        bookingAdapterProvider = new BookingProviderAdopter(this, null);
+        bookingAdapterCustomer = new BookingCustomerAdopter(this, null);
+        sqlHelper = new SqlHelper(this);
+    }
 
-
-        // Initialize the ActionBarDrawerToggle and set it as the drawer listener
+    private void setupDrawerAndToggle() {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
-
-        // This syncs the state of the drawer indicator (hamburger icon) with the drawer's state
         actionBarDrawerToggle.syncState();
+    }
 
+    private void checkInternetConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected()) {
+            intSwitch.setChecked(true);
+            Toast.makeText(this, "internet is available", Toast.LENGTH_SHORT).show();
+            updateInternetAvailability(true);
+        } else {
+            SharedPreferences.internetAvailable(this, false);
+        }
+        SharedPreferences.configureInternet(this);
+    }
 
+    private void updateInternetAvailability(boolean isAvailable) {
+        FirebaseCRUD firebaseCRUD = new FirebaseCRUD(this, null, null);
 
+        SharedPreferences.internetAvailable(this, isAvailable);
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        firebaseCRUD.setUserHasInternet(userId, isAvailable);
 
+    }
 
+    private void setupLogoutMenuItem() {
         logout.setOnMenuItemClickListener(item -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(SampleActivity.this, Login.class));
             finish();
             return true;
         });
+    }
 
+    private void setupProfileImageClickListener() {
         imageViewProfile.setOnClickListener(v -> {
-            System.out.println("Clicked");
             selectImage();
         });
+    }
+
+    private void setupBottomNavigationView() {
         if (SharedPreferences.getUserType(this).equals("provider")) {
             bottomNavigationView.getMenu().clear();
             bottomNavigationView.inflateMenu(R.menu.menu_home_provider);
@@ -98,8 +162,71 @@ public class SampleActivity extends AppCompatActivity {
             initClient();
             toggleGroup.check(R.id.client_mode);
         }
+    }
 
+    private void initClient() {
+        MenuItem menuItemHomestaySearch = bottomNavigationView.getMenu().findItem(R.id.search_homestay);
+        MenuItem menuItemBookingsClient = bottomNavigationView.getMenu().findItem(R.id.bookings_client);
+        menuItemHomestaySearch.setOnMenuItemClickListener(item -> {
+            startActivity(new Intent(SampleActivity.this, CustomerHome.class));
+            return true;
+        });
+        menuItemBookingsClient.setOnMenuItemClickListener(item -> {
+            startActivity(new Intent(SampleActivity.this, ProviderHome.class));
+            return true;
+        });
+        ArrayList<Homestay> homestays = (ArrayList<Homestay>) sqlHelper.getAllOfflineHomestays();
+        ArrayList<Booking> bookings = (ArrayList<Booking>) sqlHelper.getAllMyBookingsInOtherHomestays();
+        if (bookings.size() > 0) {
+            recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
+            recyclerViewBookings.setAdapter(bookingAdapterCustomer);
+            bookingAdapterCustomer.setBookingList(bookings);
+        } else {
+            recyclerViewBookings.setVisibility(View.GONE);
+        }
 
+        if (homestays.size() > 0) {
+            recyclerViewHomestays.setLayoutManager(new LinearLayoutManager(this));
+            recyclerViewHomestays.setAdapter(homestayAdapter);
+            homestayAdapter.setHomestayList(homestays);
+        } else {
+            recyclerViewHomestays.setVisibility(View.GONE);
+        }
+    }
+
+    private void initProvider() {
+        MenuItem menuItemHomestays = bottomNavigationView.getMenu().findItem(R.id.homestays);
+        MenuItem menuItemBookingsProvider = bottomNavigationView.getMenu().findItem(R.id.bookings_provider);
+        menuItemHomestays.setOnMenuItemClickListener(item -> {
+            startActivity(new Intent(SampleActivity.this, ProviderHome.class));
+            return true;
+        });
+        menuItemBookingsProvider.setOnMenuItemClickListener(item -> {
+            startActivity(new Intent(SampleActivity.this, ProviderBookings.class));
+            return true;
+        });
+
+        ArrayList<Homestay> homestays = (ArrayList<Homestay>) sqlHelper.getAllHomestays();
+        ArrayList<Booking> bookings = (ArrayList<Booking>) sqlHelper.getAllBookingsInMyHomestays();
+        if (bookings.size() > 0) {
+            recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
+            recyclerViewBookings.setAdapter(bookingAdapterProvider);
+            bookingAdapterProvider.setBookingList(bookings);
+        } else {
+//            recyclerViewBookings.setVisibility(View.GONE);
+        }
+
+        if (homestays.size() > 0) {
+            recyclerViewHomestays.setLayoutManager(new LinearLayoutManager(this));
+            recyclerViewHomestays.setAdapter(homestayAdapter);
+            homestayAdapter.setHomestayList(homestays);
+        } else {
+//            recyclerViewHomestays.setVisibility(View.GONE);
+        }
+
+    }
+
+    private void setupToggleGroup() {
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
                 if (checkedId == R.id.provider_mode) {
@@ -117,16 +244,21 @@ public class SampleActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-
-        getLocation();
-
-
+    private void setupInternetSwitch() {
+        intSwitch.setOnClickListener(view -> {
+            if (intSwitch.isChecked()) {
+                Toast.makeText(SampleActivity.this, "internet is available", Toast.LENGTH_SHORT).show();
+                updateInternetAvailability(true);
+            } else {
+                Toast.makeText(SampleActivity.this, "internet is not available", Toast.LENGTH_SHORT).show();
+                updateInternetAvailability(false);
+            }
+        });
     }
 
     private void getLocation() {
-
-
         double latitude = gpsTracker.getLatitude();
         double longitude = gpsTracker.getLongitude();
 
@@ -134,63 +266,11 @@ public class SampleActivity extends AppCompatActivity {
         reverseGeocodingTask.execute(latitude, longitude);
     }
 
-
-    private void init() {
-        // Initialize the toolbar and set it as the action bar for the activity
-        toolbar = findViewById(R.id.toolbar);
-
-        // Initialize the drawer layout
-        drawerLayout = findViewById(R.id.drawer_layout);
-
-        // Initialize the NavigationView
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Set up your navigation view listener here, if needed
-        imageViewProfile = navigationView.getHeaderView(0).findViewById(R.id.profile_image);
-
-        // get the logout menu item and set its click listener
-        logout = navigationView.getMenu().findItem(R.id.logout);
-
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-        MenuItem menuItemToggle = navigationView.getMenu().findItem(R.id.buyer_seller_options);
-        toggleGroup = (MaterialButtonToggleGroup) menuItemToggle.getActionView().findViewById(R.id.toggle_button_buyer_seller);
-
-        storageReference = FirebaseStorage.getInstance("gs://homestaybooking-f8308.appspot.com/").getReference("images/profiles");
-        System.out.println("Storage reference: " + storageReference);
-
-
-    }
-
-    private void initClient(){
-        MenuItem menuItemHomestaySearch = bottomNavigationView.getMenu().findItem(R.id.search_homestay);
-        MenuItem menuItemBookingsClient = bottomNavigationView.getMenu().findItem(R.id.bookings_client);
-        menuItemHomestaySearch.setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(SampleActivity.this, CustomerHome.class));
-            return true;
-        });
-        menuItemBookingsClient.setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(SampleActivity.this, ProviderHome.class));
-            return true;
-        });
-    }
-
-    private void initProvider(){
-        MenuItem menuItemHomestays = bottomNavigationView.getMenu().findItem(R.id.homestays);
-        MenuItem menuItemBookingsProvider = bottomNavigationView.getMenu().findItem(R.id.bookings_provider);
-        menuItemHomestays.setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(SampleActivity.this, ProviderHome.class));
-            return true;
-        });
-        menuItemBookingsProvider.setOnMenuItemClickListener(item -> {
-            startActivity(new Intent(SampleActivity.this, ProviderHome.class));
-            return true;
-        });
-    }
-
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent,100);
+        startActivityForResult(intent, 100);
     }
 
     @Override
@@ -198,8 +278,7 @@ public class SampleActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 100) {
-            assert data != null;
-            if (data.getData() != null) {
+            if (data != null && data.getData() != null) {
                 imageUri = data.getData();
                 ImageView imageView = findViewById(R.id.profile_image);
                 Picasso.get()
@@ -207,18 +286,15 @@ public class SampleActivity extends AppCompatActivity {
                         .resize(180, 180)
                         .centerCrop()
                         .into(imageView);
-                storageReference.putFile(imageUri)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Toast.makeText(SampleActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
+                uploadImageToStorage();
             }
         }
-
     }
 
-
+    private void uploadImageToStorage() {
+        storageReference.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    Toast.makeText(SampleActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                });
+    }
 }

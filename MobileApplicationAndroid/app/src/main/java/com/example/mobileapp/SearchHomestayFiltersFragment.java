@@ -23,6 +23,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.mobileapp.memorymanager.SharedPreferences;
+import com.example.mobileapp.smsmanager.SMSSender;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -50,7 +52,7 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
     private ToggleButton toggleButton;
     private Spinner spinner;
     private EditText byKm, address;
-    private Button searchBtn;
+    private Button searchBtn, loadBtn;
     private String checkInDateStr, checkOutDateStr;
 
     @NonNull
@@ -64,6 +66,14 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
         View view = getActivity().getLayoutInflater().inflate(R.layout.search_homestay_filters, null,false);
         init(view);
         initListerners();
+
+        if (SharedPreferences.isInternetAvailable(getActivity())){
+            loadBtn.setVisibility(View.GONE);
+        }
+        else {
+            loadBtn.setVisibility(View.VISIBLE);
+        }
+
 
 
 
@@ -153,6 +163,39 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
             }
         });
 
+        loadBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                String checkIn = checkInDate.getText().toString();
+//                String checkOut = checkOutDate.getText().toString();
+//                System.out.println("checkIn: " + checkIn);
+//                System.out.println("checkOut: " + checkOut);
+
+                String sortBy = spinner.getSelectedItem().toString();
+                System.out.println("sortBy: " + sortBy);
+                String addres = address.getText().toString();
+                System.out.println("address: " + addres);
+
+                String byKmm = byKm.getText().toString();
+                System.out.println("byKm: " + byKmm);
+
+
+
+                if (((!addres.isEmpty() && !sortBy.isEmpty()) || !byKmm.isEmpty())) {
+                    SMSSender.getHomestaysFromServer(getActivity(), sortBy, addres, byKmm);
+//                    onInputListener.sendInput(checkIn, checkOut, addres, sortBy, byKmm);
+//                    dismiss();
+                }
+                else {
+                    Snackbar.make(view, "Please fill all the necessary  fields", Snackbar.LENGTH_LONG).setAnchorView(R.id.search)
+                            .show();
+
+                }
+
+
+            }
+        });
+
 
     }
 
@@ -165,6 +208,7 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
         byKm = view.findViewById(R.id.by_km);
         spinner = view.findViewById(R.id.dropdown);
         searchBtn = view.findViewById(R.id.search);
+        loadBtn = view.findViewById(R.id.load);
         address = view.findViewById(R.id.searchTerm);
     }
 

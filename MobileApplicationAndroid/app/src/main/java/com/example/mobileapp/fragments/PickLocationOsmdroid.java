@@ -33,6 +33,7 @@ public class PickLocationOsmdroid extends DialogFragment implements MapEventsRec
 //    private View view;
     private MapView mapView;
     private Button btnPickLocation;
+    private GPSTracker gpsTracker;
 
 
 
@@ -56,15 +57,26 @@ public class PickLocationOsmdroid extends DialogFragment implements MapEventsRec
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_pick_location_osmdroid,null);
         final Context ctx = view.getContext();
+
+        gpsTracker = new GPSTracker(ctx);
+
         mapView = view.findViewById(R.id.mapView);
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
         MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(getContext(), this);
         mapView.getOverlays().add(0, mapEventsOverlay);
 
+        mapView.setMaxZoomLevel(20.0);
+        mapView.setMinZoomLevel(1.0);
+
+        //set default location
+        GeoPoint startPoint = new GeoPoint(gpsTracker.getLatitude(), gpsTracker.getLongitude());
+        mapView.getController().setCenter(startPoint);
+        mapView.getController().setZoom(7.0);
+
         btnPickLocation = view.findViewById(R.id.btnPickLocation);
 
-        mapView.setTileSource(TileSourceFactory.MAPNIK); // Set the tile source to OpenStreetMap
+        mapView.setTileSource(TileSourceFactory.OpenTopo); // Set the tile source to OpenStreetMap
         mapView.setBuiltInZoomControls(true); // Enable built-in zoom controls
         mapView.setMultiTouchControls(true); // Enable multi-touch controls
         mapView.setZ(10);

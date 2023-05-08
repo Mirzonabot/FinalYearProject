@@ -56,7 +56,7 @@ public class Login extends AppCompatActivity {
         fAuth = FirebaseAuth.getInstance();
         // check if user is already logged in
         if (fAuth.getCurrentUser() != null) {
-            startActivity(new Intent(getApplicationContext(), Home.class));
+            startActivity(new Intent(getApplicationContext(), SampleActivity.class));
         }
 
         // create new account
@@ -97,7 +97,7 @@ public class Login extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
 
                             saveToken();
-                            startActivity(new Intent(getApplicationContext(), Home.class));
+                            startActivity(new Intent(getApplicationContext(), SampleActivity.class));
                         } else {
                             Toast.makeText(Login.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);

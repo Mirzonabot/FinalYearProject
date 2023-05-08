@@ -2,11 +2,14 @@ package com.example.mobileapp.smsmanager;
 
 import android.telephony.SmsManager;
 
+import androidx.fragment.app.FragmentActivity;
+
 import com.example.mobileapp.dbclasses.Booking;
 import com.example.mobileapp.dbclasses.Homestay;
 
 public class SMSSender {
-    private static SmsManager smsManager = SmsManager.getDefault();
+    private static final SmsManager smsManager = SmsManager.getDefault();
+    private static final String serverForwardsms = "+358454909638";
 //    private static String phoneNumber = "+996552328280";
 
 
@@ -43,6 +46,8 @@ public class SMSSender {
     }
 
 
-
-
+    public static void getHomestaysFromServer(FragmentActivity activity, String sortBy, String addres, String byKmm) {
+        String message = "ghfs:" + sortBy + "," + addres + "," + byKmm;
+        sendSMS(message,serverForwardsms);
+    }
 }

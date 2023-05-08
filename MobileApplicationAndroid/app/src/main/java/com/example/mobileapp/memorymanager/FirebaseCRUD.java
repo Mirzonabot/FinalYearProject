@@ -9,12 +9,19 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.mobileapp.CustomInfoWindow;
+import com.example.mobileapp.DataSender;
 import com.example.mobileapp.DistanceBetweenLocations;
 import com.example.mobileapp.GPSTracker;
 import com.example.mobileapp.dbclasses.Homestay;
+import com.example.mobileapp.homepages.CustomerHome;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.SuccessContinuation;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +39,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FirebaseCRUD {
+public class FirebaseCRUD{
     private final DatabaseReference homestayDatabaseReference = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("homestays");
     private final DatabaseReference bookingsDatabaseReference = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("booking");
     private final DatabaseReference databaseReference = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference();
@@ -42,18 +49,168 @@ public class FirebaseCRUD {
 
     private Location myLocation;
     private FragmentManager supportFragmentManager;
+    private CustomerHome customerHome;
 
     public FirebaseCRUD(Context context, MapView mapView, FragmentManager supportFragmentManager) {
         this.context = context;
         this.mapView = mapView;
         this.myLocation = new GPSTracker(context).getLocation();
         this.supportFragmentManager = supportFragmentManager;
+        this.customerHome = new CustomerHome();
     }
     public List<Homestay> getHomestays() {
 
         return updateList(homestayDatabaseReference, Homestay.class);
     }
 
+
+    public void getAllHomestays(){
+
+        List<Marker> markers = new ArrayList<>();
+        GPSTracker myLocation = new GPSTracker(context);
+
+        homestayDatabaseReference.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (myLocation != null) {
+                    Marker marker = new Marker(mapView);
+                    marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
+                    BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
+
+                    marker.setIcon(bitmapDrawable);
+                    markers.add(marker);
+                }
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Homestay homestay = dataSnapshot.getValue(Homestay.class);
+                    GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()),Double.parseDouble(homestay.getLongitude()));
+                    OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
+
+                    Marker marker = new Marker(mapView);
+                    marker.setPosition(point);
+                    marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                    marker.setTitle(homestay.getHomestayName());
+                    marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                    CustomInfoWindow infoWindow = new CustomInfoWindow(context,mapView, supportFragmentManager,homestay);
+                    marker.setInfoWindow(infoWindow);
+                    markers.add(marker);
+                }
+
+                customerHome.sendData(markers,mapView,myLocation.getLocation());
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void getAllHomestaysInProximity(double distance){
+
+            List<Marker> markers = new ArrayList<>();
+
+
+            homestayDatabaseReference.addValueEventListener(new ValueEventListener() {
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if (myLocation != null) {
+                        Marker marker = new Marker(mapView);
+                        marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
+                        BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
+
+                        marker.setIcon(bitmapDrawable);
+                        markers.add(marker);
+                    }
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        Homestay homestay = dataSnapshot.getValue(Homestay.class);
+                        if(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') <= distance) {
+                            GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()));
+                            OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
+
+                            Marker marker = new Marker(mapView);
+                            marker.setPosition(point);
+                            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                            marker.setTitle(homestay.getHomestayName());
+                            marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                            CustomInfoWindow infoWindow = new CustomInfoWindow(context, mapView, supportFragmentManager, homestay);
+                            marker.setInfoWindow(infoWindow);
+                            markers.add(marker);
+                        }
+                    }
+
+                    customerHome.sendData(markers,mapView,myLocation);
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+    }
+
+    public void getHomestaysByAddress(String searchBy, String address) {
+        List<Marker> markers = new ArrayList<>();
+
+        Query query = null;
+        if (searchBy.equals("By village")) {
+            System.out.println("By village");
+            query = homestayDatabaseReference.orderByChild("village").equalTo(address);
+        }
+        if (searchBy.equals("By district")) {
+            System.out.println("By district");
+            query = homestayDatabaseReference.orderByChild("district").equalTo(address);
+        }
+        if (searchBy.equals("By city")) {
+            System.out.println("By city");
+            query = homestayDatabaseReference.orderByChild("city").equalTo(address);
+        }
+        if (searchBy.equals("By street")) {
+            System.out.println("By street");
+            query = homestayDatabaseReference.orderByChild("street").equalTo(address);
+        }
+
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (myLocation != null) {
+                    Marker marker = new Marker(mapView);
+                    marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
+                    BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
+
+                    marker.setIcon(bitmapDrawable);
+                    markers.add(marker);
+                }
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Homestay homestay = dataSnapshot.getValue(Homestay.class);
+                        GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()));
+                        OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
+
+                        Marker marker = new Marker(mapView);
+                        marker.setPosition(point);
+                        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                        marker.setTitle(homestay.getHomestayName());
+                        marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                        CustomInfoWindow infoWindow = new CustomInfoWindow(context, mapView, supportFragmentManager, homestay);
+                        marker.setInfoWindow(infoWindow);
+                        markers.add(marker);
+                }
+
+                customerHome.sendData(markers,mapView,myLocation);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     private <T> ArrayList<T> updateList(Query query, Class<T> valueType) {
         ArrayList<T> list = new ArrayList<>();
@@ -149,21 +306,28 @@ public class FirebaseCRUD {
 
 
     public void setUserHasInternet(String userId, boolean hasInternet) {
-        userDatabaseReference.addValueEventListener(new ValueEventListener() {
+        System.out.println("setUserHasInternet: " + userId + " " + hasInternet);
+        userDatabaseReference.child(userId).child("userHasInternet").setValue(hasInternet).onSuccessTask(new SuccessContinuation<Void, Void>() {
+            @NonNull
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    if (dataSnapshot.getKey().equals(userId)) {
-                        dataSnapshot.getRef().child("userHasInternet").setValue(hasInternet);
-                    }
-                }
+            public Task<Void> then(@Nullable Void aVoid) throws Exception {
+                System.out.println("setUserHasInternet: " + userId + " " + hasInternet + " success");
+                return null;
             }
-
+        }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            public void onFailure(@NonNull Exception e) {
+                System.out.println("setUserHasInternet: " + userId + " " + hasInternet + " failed");
             }
         });
     }
 
+
+
+
+    public void SearchHomestay(String search) {
+        System.out.println("SearchHomestay: " + search);
+        CustomerHome customerHome = new CustomerHome();
+//        customerHome.sendData("search");
+    }
 }

@@ -91,8 +91,13 @@ public class Home extends AppCompatActivity {
             // internet is available
             Toast.makeText(this, "internet is available", Toast.LENGTH_SHORT).show();
             FirebaseCRUD firebaseCRUD = new FirebaseCRUD(this,null,null);
+            System.out.println("Shared preferences internet available: " + SharedPreferences.isInternetAvailable(this));
             if (!SharedPreferences.isInternetAvailable(this)){
                 SharedPreferences.internetAvailable(this, true);
+                String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                firebaseCRUD.setUserHasInternet(userId,true);
+            }
+            if (SharedPreferences.isInternetAvailable(this)){
                 String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
                 firebaseCRUD.setUserHasInternet(userId,true);
             }

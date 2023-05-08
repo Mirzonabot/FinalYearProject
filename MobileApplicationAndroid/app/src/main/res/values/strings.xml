@@ -42,4 +42,5 @@
     <string name="homestays">HomeStays</string>
     <string name="bookings_string">Bookings</string>
     <string name="search_homestays">Search Homestays</string>
+    <string name="download_map_string">Download Map</string>
 </resources>

@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.example.mobileapp.DistanceBetweenLocations;
 import com.example.mobileapp.dbclasses.Booking;
 import com.example.mobileapp.dbclasses.Homestay;
 
@@ -495,4 +496,18 @@ public class SqlHelper extends SQLiteOpenHelper {
     }
 
 
+    public List<Homestay> inTheRange(Double valueOf, double latitude, double longitude) {
+
+        List<Homestay> homestays = new ArrayList<>();
+
+        for (Homestay homestay : getAllHomestays()) {
+            if (DistanceBetweenLocations.distance(latitude, longitude, Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()),'K') <= valueOf) {
+                homestays.add(homestay);
+            }
+        }
+
+        return homestays;
+
+
+    }
 }

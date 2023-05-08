@@ -4,131 +4,213 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="80dp"
     tools:context=".NewHomestay">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:title="Add a new Homestay"
+            android:layout_alignParentTop="true"
+            app:titleCentered="true"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="32dp"
+            android:layout_below="@+id/toolbar">
 
-    <TextView
-
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50px"
-        android:width="800px"
-        android:gravity="center"
-        android:padding="10px"
-        android:paddingBottom="40dp"
-        android:text="Add a new Homestay"
-        android:textSize="20sp" />
-
-    <EditText
-        android:id="@+id/city"
-        android:layout_width="wrap_content"
-        android:layout_height="49dp"
-        android:layout_below="@+id/numAvailableSpaces"
-        android:width="800px"
-        android:ems="10"
-        android:hint="Name of city"
-        android:inputType="textPersonName"
-        android:textColorHint="@color/input_hint" />
-
-    <EditText
-        android:id="@+id/district"
-        android:layout_width="wrap_content"
-        android:layout_height="49dp"
-        android:layout_below="@+id/city"
-        android:width="800px"
-        android:ems="10"
-        android:hint="Name of district"
-        android:inputType="textPersonName"
-        android:textColorHint="@color/input_hint" />
-
-    <EditText
-        android:id="@+id/village"
-        android:layout_width="wrap_content"
-        android:layout_height="49dp"
-        android:layout_below="@+id/district"
-        android:width="800px"
-        android:ems="10"
-        android:hint="Name of village"
-        android:inputType="textPersonName"
-        android:textColorHint="@color/input_hint" />
-    <EditText
-        android:id="@+id/street"
-        android:layout_width="wrap_content"
-        android:layout_height="49dp"
-        android:layout_below="@+id/village"
-        android:width="800px"
-        android:ems="10"
-        android:hint="Name of street"
-        android:inputType="textPersonName"
-        android:textColorHint="@color/input_hint" />
+            <!--        <TextView-->
+            <!--            android:id="@+id/textView4"-->
+            <!--            android:layout_width="wrap_content"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:text="Add a new Homestay"-->
+            <!--            android:textSize="20sp"-->
+            <!--            app:layout_constraintEnd_toEndOf="parent"-->
+            <!--            app:layout_constraintStart_toStartOf="parent"-->
+            <!--            app:layout_constraintTop_toTopOf="parent" />-->
 
 
-    <EditText
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/homestayNameInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Name of Homestay"
+                app:layout_constraintBaseline_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                >
 
-        android:id="@+id/homestayName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:width="800px"
-        android:hint="Name of Homestay"
-        android:inputType="textPersonName"
-        android:textColorHint="@color/input_hint"
-        android:layout_below="@+id/textView4"/>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/homestayName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName" />
 
-    <EditText
-        android:id="@+id/numAvailableSpaces"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/homestayName"
-        android:width="800px"
-        android:hint="Number of available places"
-        android:inputType="numberDecimal"
-        android:textColorHint="@color/input_hint" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <ImageView
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/numAvailableSpacesInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Number of available places"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/homestayNameInputLayout">
 
-        android:id="@+id/addLocationFromMap"
-        android:layout_width="44dp"
-        android:layout_height="46dp"
-        android:layout_below="@+id/street"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="50dp"
-        app:srcCompat="@drawable/ic_baseline_add_location_24" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/numAvailableSpaces"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
 
-    <ImageView
+            </com.google.android.material.textfield.TextInputLayout>
 
-        android:id="@+id/addLocationFromOsmdroid"
-        android:layout_width="44dp"
-        android:layout_height="46dp"
-        android:layout_marginTop="50dp"
-        app:srcCompat="@drawable/ic_baseline_add_location_24"
-        android:layout_below="@+id/street"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/cityInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Name of city"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/numAvailableSpacesInputLayout">
 
-    <ImageView
-        android:id="@+id/addLocationFromGoogle"
-        android:layout_width="44dp"
-        android:layout_height="46dp"
-        android:layout_below="@+id/street"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="20dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/city"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName" />
 
-        android:layout_toEndOf="@+id/addLocationFromMap"
-        app:srcCompat="@drawable/ic_baseline_add_location_24" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/btnAddHomestay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/addLocationFromGoogle"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:padding="10dp"
-        android:text="Add Homestay"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/districtInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Name of district"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cityInputLayout">
 
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/district"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/villageInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Name of village"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/districtInputLayout">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/village"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/streetInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Name of street"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/villageInputLayout">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/street"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <!-- Image preview -->
+            <ImageView
+                android:id="@+id/imagePreview"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/image_place_holder"
+                app:layout_constraintDimensionRatio="H,16:9"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_layout" />
+
+            <!-- Add location button -->
+            <!--        <ImageView-->
+            <!--            android:id="@+id/addLocationFromOsmdroid"-->
+            <!--            android:layout_width="40dp"-->
+            <!--            android:layout_height="50dp"-->
+            <!--            app:layout_constraintStart_toStartOf="parent"-->
+            <!--            app:layout_constraintTop_toBottomOf="@+id/streetInputLayout"-->
+            <!--            app:srcCompat="@drawable/ic_baseline_add_location_24" />-->
+
+
+            <LinearLayout
+                android:id="@+id/button_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center"
+
+                app:layout_constraintTop_toBottomOf="@+id/streetInputLayout"
+
+                >
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add Image"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp"
+                    app:backgroundTint="@color/accent"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/addLocationFromOsmdroid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add map"
+                    android:layout_weight="1"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp"
+                    app:backgroundTint="@color/accent"
+                    app:cornerRadius="8dp" />
+            </LinearLayout>
+
+            <!-- Add Homestay button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddHomestay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Add Homestay"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                app:backgroundTint="@color/accent"
+                app:cornerRadius="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imagePreview" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </RelativeLayout>
+

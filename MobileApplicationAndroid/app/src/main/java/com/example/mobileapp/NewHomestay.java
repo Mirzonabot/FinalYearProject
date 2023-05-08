@@ -2,6 +2,7 @@ package com.example.mobileapp;
 
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.mobileapp.dbclasses.Homestay;
@@ -26,6 +28,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 import com.yandex.mapkit.MapKitFactory;
 
 
@@ -34,7 +39,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     ImageView addLocaionFromMap;
     ImageView addLocationFromGoogle;
 
-    ImageView addLocationFromOsmdroid;
+    Button addLocationFromOsmdroid;
 
     private String lt;
     private String ln;
@@ -43,8 +48,12 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     private EditText city, district, village, street;
     private EditText homeStayCapacity;
 
-    private Button addHomestay;
+    private Button addHomestay, addImage;
     private SqlHelper sqlHelper;
+    private Uri imageUri;
+
+    private StorageReference storageReference;
+    private FirebaseDatabase database;
 
     // Create a GestureDetector object
 
@@ -62,22 +71,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         initListeners();
 
 
-        addLocaionFromMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PickLocationDialog dialog = new PickLocationDialog();
-                dialog.show(getSupportFragmentManager(), "pick location");
 
-            }
-        });
-
-        addLocationFromGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                PickLocationGoogleDialog dialog = new PickLocationGoogleDialog();
-                dialog.show(getSupportFragmentManager(), "pick location");
-            }
-        });
 
         addLocationFromOsmdroid.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,15 +83,10 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
 
         FirebaseApp.initializeApp(this);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app");
-        System.out.println("________________________");
-        System.out.println("________________________");
-        System.out.println("Database: " + database);
+        database = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app");
+
 
         DatabaseReference myRef = database.getReference();
-//        myRef.child("Homestays");
-
-        System.out.println("Database reference: " + myRef);
 
 
         final String[] ownerPhoneNumber = {null};
@@ -154,6 +143,7 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 } else {
                     Homestay homestay = new Homestay(homestayName, homestayCapacity, ownerID, homestayAddress, homestayLatitude, homestayLongitude,village,street,district,city,ownerPhoneNumber[0]);
                     sqlHelper.addHomestay(homestay);
+                    uploadImageToStorage(homestay.getId());
 //                    myRef.child("homestays");
 
                     myRef.child("homestays").push().setValue(homestay);
@@ -162,15 +152,22 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 startActivity(new Intent(NewHomestay.this, ProviderHome.class));
             }
         });
+
+        addImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectImage();
+            }
+        });
     }
 
     private void initListeners() {
     }
 
     private void initInputs() {
-        addLocaionFromMap = (ImageView) findViewById(R.id.addLocationFromMap);
-        addLocationFromGoogle = (ImageView) findViewById(R.id.addLocationFromGoogle);
-        addLocationFromOsmdroid = (ImageView) findViewById(R.id.addLocationFromOsmdroid);
+//        addLocaionFromMap = (ImageView) findViewById(R.id.addLocationFromMap);
+//        addLocationFromGoogle = (ImageView) findViewById(R.id.addLocationFromGoogle);
+        addLocationFromOsmdroid = (Button) findViewById(R.id.addLocationFromOsmdroid);
         city = findViewById(R.id.city);
         district = findViewById(R.id.district);
         village = findViewById(R.id.village);
@@ -178,6 +175,8 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         homeStayCapacity = findViewById(R.id.numAvailableSpaces);
         homeStayName = findViewById(R.id.homestayName);
         addHomestay = findViewById(R.id.btnAddHomestay);
+        addImage = findViewById(R.id.btnAddImage);
+        storageReference = FirebaseStorage.getInstance("gs://homestaybooking-f8308.appspot.com/").getReference("images/homestays");
     }
 
     @Override
@@ -188,6 +187,39 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         System.out.println("Latitude: " + lat);
         System.out.println("Longitude: " + lon);
         Toast.makeText(this, "Latitude: " + lat + " Longitude: " + lon, Toast.LENGTH_SHORT).show();
+    }
+
+    private void selectImage() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, 100);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (requestCode == 100) {
+            if (data != null && data.getData() != null) {
+                imageUri = data.getData();
+                ImageView imageView = findViewById(R.id.imagePreview);
+                Picasso.get()
+                        .load(imageUri)
+                        .resize(180, 180)
+                        .centerCrop()
+                        .into(imageView);
+
+            }
+        }
+    }
+
+    private void uploadImageToStorage(String homestayID) {
+        storageReference.child(homestayID).putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    Toast.makeText(NewHomestay.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
+                });
     }
 
 }

@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="200dp"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:padding="10dp"
-    android:id="@+id/relativeLayout">
+    android:background="@color/colorDarkWhite"
+    android:padding="16dp"
+    android:id="@+id/relativeLayout"
 
-    <TextView
+    >
+
+    <ImageView
+        android:id="@+id/homestayImageView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/image_place_holder"
+        android:layout_centerHorizontal="true"
+         />
+
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_below="@+id/homestayImageView"
+        android:layout_marginTop="8dp"
+        android:text="Homestay Title"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="@color/design_default_color_primary_dark"
+        android:layout_centerHorizontal="true"/>
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/snippetTextView"
         android:layout_below="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:layout_marginTop="4dp"
+        android:text="Homestay description"
+        android:textAppearance="?attr/textAppearanceBody2"
+        android:textColor="@color/design_default_color_secondary"
+        android:layout_centerHorizontal="true"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/addToOffline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@+id/snippetTextView"
-        android:text="Offline +" />
+        android:text="Offline +"
+        android:textColor="@color/white"
+        app:backgroundTint="@color/design_default_color_primary"
+        app:cornerRadius="4dp"
+        app:elevation="4dp"
+        android:layout_below="@+id/snippetTextView"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>
