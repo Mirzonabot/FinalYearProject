@@ -123,8 +123,7 @@ public class Signup extends AppCompatActivity {
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                     .setDisplayName(fullName)
                                     .build();
-                            user1.updateProfile(profileUpdates)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            user1.updateProfile(profileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
@@ -150,7 +149,7 @@ public class Signup extends AppCompatActivity {
                                                 String token = task.getResult().getToken();
 
 
-                                                TokenUserID tokenUserID = new TokenUserID(user1.getUid(),user1.getDisplayName(),user1.getEmail(),mphoneNumber.getText().toString(),token);
+                                                TokenUserID tokenUserID = new TokenUserID(user1.getUid(),fullName,user1.getEmail(),mphoneNumber.getText().toString(),token);
                                                 SharedPreferences.setPhoneNumber(Signup.this,mphoneNumber.getText().toString());
 //                                                myRef.child("tokenUserID").push().setValue();
                                                 myRef.child(user1.getUid()).setValue(tokenUserID).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -168,10 +167,34 @@ public class Signup extends AppCompatActivity {
                                             }
                                         }
                                     });
+
+                            myRef.child(user1.getUid()).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
+                                    TokenUserID user = snapshot.getValue(TokenUserID.class);
+                                    System.out.println("______________________");
+                                    System.out.println(user);
+                                    System.out.println("______________________");
+                                    SharedPreferences.setPhoneNumber(Signup.this, user.getUserPhoneNumber());
+                                    SharedPreferences.setUserName(Signup.this, user.getUserName());
+                                    SharedPreferences.setEmail(Signup.this, user.getUserEmail());
+                                    SharedPreferences.setUserId(Signup.this, user.getUserID());
+                                    startActivity(new Intent(getApplicationContext(), SampleActivity.class));
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull com.google.firebase.database.DatabaseError error) {
+
+                                }
+                            });
                             System.out.println("you are in 7");
                             Toast.makeText(Signup.this,"User created!",Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
-                            startActivity(new Intent(getApplicationContext(), SampleActivity.class));
+
+
+
+
+
                         }else {
                             System.out.println("you are in 8");
                             Toast.makeText(Signup.this,"error!"+task.getException().getLocalizedMessage(),Toast.LENGTH_SHORT).show();

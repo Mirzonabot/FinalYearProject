@@ -10,5 +10,8 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.List;
 
 public interface DataSender {
-    void sendData(List<Marker> homestays, MapView mapView, Location myLocation);
+    void sendData(List<MarkerCustomized> homestays, MapView mapView, Location myLocation);
+
+    void sendInputToNewHomestay(String input);
+
 }

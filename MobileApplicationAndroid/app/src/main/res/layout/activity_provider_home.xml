@@ -5,12 +5,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".homepages.ProviderHome">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="Find and book"
+        app:titleTextColor="?attr/colorOnPrimary"
+        android:textAlignment="center"
+        app:menu="@menu/top_app_bar_provider_homepage"
+        app:navigationIcon="@drawable/baseline_arrow_back_24"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/relativeLayout"
         android:visibility="gone"
+        android:layout_below="@+id/topAppBar"
         >
         <TextView
             android:layout_width="wrap_content"
@@ -23,6 +35,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/myHomestaysRecyclerView"
+        android:layout_below="@+id/topAppBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="3dp"

@@ -62,5 +62,31 @@ public class SharedPreferences {
         return sharedPreferences.getString("userType", "");
     }
 
+    public static void setUserName(Context context, String userName){
+        android.content.SharedPreferences sharedPreferences = context.getSharedPreferences("userName", Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("userName", userName);
+        editor.apply();
+    }
+
+    public static String getUserName(Context context){
+        android.content.SharedPreferences sharedPreferences = context.getSharedPreferences("userName", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("userName", "");
+    }
+
+    //set email
+    public static void setEmail(Context context, String email){
+        android.content.SharedPreferences sharedPreferences = context.getSharedPreferences("email", Context.MODE_PRIVATE);
+        android.content.SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("email", email);
+        editor.apply();
+    }
+
+    //get email
+    public static String getEmail(Context context){
+        android.content.SharedPreferences sharedPreferences = context.getSharedPreferences("email", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("email", "");
+    }
+
 
 }

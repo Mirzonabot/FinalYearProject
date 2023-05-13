@@ -1,4 +1,4 @@
-package com.example.mobileapp;
+package com.example.mobileapp.fragments;
 
 
 
@@ -23,6 +23,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.mobileapp.GPSTracker;
+import com.example.mobileapp.R;
 import com.example.mobileapp.memorymanager.SharedPreferences;
 import com.example.mobileapp.smsmanager.SMSSender;
 import com.google.android.material.datepicker.CalendarConstraints;
@@ -53,6 +55,7 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
     private Spinner spinner;
     private EditText byKm, address;
     private Button searchBtn, loadBtn;
+    private GPSTracker gpsTracker;
     private String checkInDateStr, checkOutDateStr;
 
     @NonNull
@@ -63,6 +66,7 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
         Configuration config = new Configuration(res.getConfiguration());
         config.setLocale(locale);
         Context context = getActivity().createConfigurationContext(config);
+        gpsTracker = new GPSTracker(context);
         View view = getActivity().getLayoutInflater().inflate(R.layout.search_homestay_filters, null,false);
         init(view);
         initListerners();
@@ -166,10 +170,6 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
         loadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                String checkIn = checkInDate.getText().toString();
-//                String checkOut = checkOutDate.getText().toString();
-//                System.out.println("checkIn: " + checkIn);
-//                System.out.println("checkOut: " + checkOut);
 
                 String sortBy = spinner.getSelectedItem().toString();
                 System.out.println("sortBy: " + sortBy);
@@ -182,7 +182,7 @@ public class SearchHomestayFiltersFragment extends DialogFragment {
 
 
                 if (((!addres.isEmpty() && !sortBy.isEmpty()) || !byKmm.isEmpty())) {
-                    SMSSender.getHomestaysFromServer(getActivity(), sortBy, addres, byKmm);
+                    SMSSender.getHomestaysFromServer(getActivity(), sortBy, addres, byKmm,String.valueOf(gpsTracker.getLatitude()),String.valueOf(gpsTracker.getLongitude()));
 //                    onInputListener.sendInput(checkIn, checkOut, addres, sortBy, byKmm);
 //                    dismiss();
                 }

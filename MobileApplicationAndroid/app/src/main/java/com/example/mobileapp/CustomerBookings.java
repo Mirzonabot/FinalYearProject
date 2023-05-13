@@ -82,7 +82,7 @@ public class CustomerBookings extends AppCompatActivity {
             recyclerView.setAdapter(bookingCustomerAdopter);
         }
         else {
-            SqlHelper sqlHelper = new SqlHelper(this);
+            SqlHelper sqlHelper = new SqlHelper(this,null,null);
             ArrayList<Booking> bookings = sqlHelper.getAllMyBookingsInOtherHomestays();
             bookingCustomerAdopter = new BookingCustomerAdopter(this,bookings);
             recyclerView.setAdapter(bookingCustomerAdopter);

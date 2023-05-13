@@ -5,7 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".homepages.CustomerHome">
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:title="Find and book"
+        app:titleTextColor="?attr/colorOnPrimary"
+        android:textAlignment="center"
+        app:menu="@menu/top_app_bar"
+        app:navigationIcon="@drawable/baseline_arrow_back_24"
+        />
     <org.osmdroid.views.MapView
+        android:layout_below="@+id/topAppBar"
         android:id="@+id/mapView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

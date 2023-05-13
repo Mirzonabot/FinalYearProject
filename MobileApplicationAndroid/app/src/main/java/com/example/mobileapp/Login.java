@@ -97,7 +97,7 @@ public class Login extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
 
                             saveToken();
-                            startActivity(new Intent(getApplicationContext(), SampleActivity.class));
+
                         } else {
                             Toast.makeText(Login.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
@@ -134,11 +134,18 @@ public class Login extends AppCompatActivity {
 
                                         myRef.child(userId).child("token").setValue(token);
 
-                                        myRef.child(userId).child("userPhoneNumber").addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
+                                        myRef.child(userId).addListenerForSingleValueEvent(new com.google.firebase.database.ValueEventListener() {
                                             @Override
                                             public void onDataChange(@NonNull com.google.firebase.database.DataSnapshot snapshot) {
-                                                String userPhoneNumber = snapshot.getValue(String.class);
-                                                SharedPreferences.setPhoneNumber(Login.this, userPhoneNumber);
+                                                TokenUserID user = snapshot.getValue(TokenUserID.class);
+                                                System.out.println("______________________");
+                                                System.out.println(user);
+                                                System.out.println("______________________");
+                                                SharedPreferences.setPhoneNumber(Login.this, user.getUserPhoneNumber());
+                                                SharedPreferences.setUserName(Login.this, user.getUserName());
+                                                SharedPreferences.setEmail(Login.this, user.getUserEmail());
+                                                SharedPreferences.setUserId(Login.this, user.getUserID());
+                                                startActivity(new Intent(getApplicationContext(), SampleActivity.class));
                                             }
 
                                             @Override

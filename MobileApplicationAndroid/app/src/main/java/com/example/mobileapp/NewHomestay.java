@@ -2,6 +2,7 @@ package com.example.mobileapp;
 
 
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -20,6 +21,8 @@ import com.example.mobileapp.fragments.PickLocationDialog;
 import com.example.mobileapp.fragments.PickLocationGoogleDialog;
 import com.example.mobileapp.fragments.PickLocationOsmdroid;
 import com.example.mobileapp.homepages.ProviderHome;
+import com.example.mobileapp.memorymanager.FirebaseCRUD;
+import com.example.mobileapp.memorymanager.SharedPreferences;
 import com.example.mobileapp.memorymanager.SqlHelper;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,13 +36,16 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.yandex.mapkit.MapKitFactory;
 
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
+import java.util.List;
+
 
 public class NewHomestay extends AppCompatActivity implements PickLocationDialog.OnInputListener, PickLocationGoogleDialog.OnInputListener, PickLocationOsmdroid.OnInputListener{
 
-    ImageView addLocaionFromMap;
-    ImageView addLocationFromGoogle;
 
-    Button addLocationFromOsmdroid;
+    private Button addLocationFromOsmdroid;
 
     private String lt;
     private String ln;
@@ -53,9 +59,10 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     private Uri imageUri;
 
     private StorageReference storageReference;
-    private FirebaseDatabase database;
 
-    // Create a GestureDetector object
+    private FirebaseCRUD firebaseCRUD;
+    private String ownerPhoneNumber;
+
 
 
 
@@ -63,16 +70,19 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MapKitFactory.setApiKey("69044d6e-9641-4c53-8d74-897fb9363d17");
         setContentView(R.layout.activity_new_homestay);
-        sqlHelper = new SqlHelper(this);
-//        getSupportActionBar().hide();
         initInputs();
-        initListeners();
+        sqlHelper = new SqlHelper(this,null,null);
+        FirebaseApp.initializeApp(this);
 
 
+        firebaseCRUD.getUserById(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
+    }
 
+    private void initListeners() {
+        System.out.println("initListeners");
+        assert addLocationFromOsmdroid != null;
         addLocationFromOsmdroid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,34 +90,6 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 pickLocationOsmdroid.show(getSupportFragmentManager(),"pick location from osmdroid");
             }
         });
-
-        FirebaseApp.initializeApp(this);
-
-        database = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app");
-
-
-        DatabaseReference myRef = database.getReference();
-
-
-        final String[] ownerPhoneNumber = {null};
-        database.getReference("tokenUserID").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    if (dataSnapshot.getKey().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                        TokenUserID tokenUserID = dataSnapshot.getValue(TokenUserID.class);
-                        ownerPhoneNumber[0] = tokenUserID.getUserPhoneNumber();
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-
         addHomestay.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -120,9 +102,6 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 String homestayAddress = city + ", " + district + ", " + village + ", " + street;
                 int homestayCapacity = 0;
                 String ownerID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-
-
                 try {
                     homestayCapacity = Integer.parseInt(String.valueOf(homeStayCapacity.getText()));
 
@@ -135,18 +114,14 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                 }
                 String homestayLatitude = lt;
                 String homestayLongitude = ln;
-
-
                 if (homestayName.isEmpty() || homestayAddress.isEmpty() || String.valueOf(homeStayCapacity.getText()).isEmpty() || homestayLatitude.isEmpty() || homestayLongitude.isEmpty()) {
                     Toast.makeText(NewHomestay.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 } else {
-                    Homestay homestay = new Homestay(homestayName, homestayCapacity, ownerID, homestayAddress, homestayLatitude, homestayLongitude,village,street,district,city,ownerPhoneNumber[0]);
+                    Homestay homestay = new Homestay(homestayName, homestayCapacity, ownerID, homestayAddress, homestayLatitude, homestayLongitude,village,street,district,city, SharedPreferences.getPhoneNumber(NewHomestay.this));
                     sqlHelper.addHomestay(homestay);
                     uploadImageToStorage(homestay.getId());
-//                    myRef.child("homestays");
-
-                    myRef.child("homestays").push().setValue(homestay);
+                    firebaseCRUD.createHomestay(homestay);
                     Toast.makeText(NewHomestay.this, "Homestay added", Toast.LENGTH_SHORT).show();
                 }
                 startActivity(new Intent(NewHomestay.this, ProviderHome.class));
@@ -161,12 +136,8 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         });
     }
 
-    private void initListeners() {
-    }
-
     private void initInputs() {
-//        addLocaionFromMap = (ImageView) findViewById(R.id.addLocationFromMap);
-//        addLocationFromGoogle = (ImageView) findViewById(R.id.addLocationFromGoogle);
+        System.out.println("init inputs");
         addLocationFromOsmdroid = (Button) findViewById(R.id.addLocationFromOsmdroid);
         city = findViewById(R.id.city);
         district = findViewById(R.id.district);
@@ -176,11 +147,14 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
         homeStayName = findViewById(R.id.homestayName);
         addHomestay = findViewById(R.id.btnAddHomestay);
         addImage = findViewById(R.id.btnAddImage);
+        firebaseCRUD = new FirebaseCRUD(this,null,null);
         storageReference = FirebaseStorage.getInstance("gs://homestaybooking-f8308.appspot.com/").getReference("images/homestays");
+        initListeners();
     }
 
     @Override
     public void sendInput(String lat, String lon) {
+        initInputs();
         ln = lon;
         lt = lat;
         System.out.println("______________________________________________________");
@@ -221,5 +195,12 @@ public class NewHomestay extends AppCompatActivity implements PickLocationDialog
                     Toast.makeText(NewHomestay.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
+//    @Override
+//    public void sendData(List<MarkerCustomized> homestays, MapView mapView, Location myLocation) {
+//
+//    }
+
 
 }

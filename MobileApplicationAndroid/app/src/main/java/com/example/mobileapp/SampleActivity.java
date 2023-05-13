@@ -33,6 +33,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -50,18 +51,17 @@ public class SampleActivity extends AppCompatActivity {
     private ImageView imageViewProfile;
     private StorageReference storageReference;
     private MaterialToolbar toolbar;
-    private MenuItem logout,downloadMap;
+    private MenuItem logout, downloadMap;
     private MaterialButtonToggleGroup toggleGroup;
     private GPSTracker gpsTracker;
     private SwitchCompat intSwitch;
     private RecyclerView recyclerViewHomestays;
     private RecyclerView recyclerViewBookings;
-
     private HomestayAdapter homestayAdapter;
     private BookingProviderAdopter bookingAdapterProvider;
     private BookingCustomerAdopter bookingAdapterCustomer;
     private SqlHelper sqlHelper;
-
+    private MaterialTextView profileName, profileEmail,profilePhone;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,19 +79,20 @@ public class SampleActivity extends AppCompatActivity {
         setupInternetSwitch();
         getLocation();
     }
-
     private void setupDownloadMapMenuItem() {
         downloadMap.setOnMenuItemClickListener(item -> {
             startActivity(new Intent(SampleActivity.this, MapDownloader.class));
             return true;
         });
     }
-
     private void initViews() {
         toolbar = findViewById(R.id.toolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         imageViewProfile = navigationView.getHeaderView(0).findViewById(R.id.profile_image);
+        profileName = navigationView.getHeaderView(0).findViewById(R.id.profile_name);
+        profileEmail = navigationView.getHeaderView(0).findViewById(R.id.profile_email);
+        profilePhone = navigationView.getHeaderView(0).findViewById(R.id.profile_phone);
         logout = navigationView.getMenu().findItem(R.id.logout);
         downloadMap = navigationView.getMenu().findItem(R.id.downloadMap);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -102,18 +103,31 @@ public class SampleActivity extends AppCompatActivity {
         gpsTracker = new GPSTracker(this);
         recyclerViewHomestays = findViewById(R.id.recycler_view_homestays);
         recyclerViewBookings = findViewById(R.id.recycler_view_bookings);
-        homestayAdapter = new HomestayAdapter(this, null);
+        homestayAdapter = new HomestayAdapter(this, null,true);
         bookingAdapterProvider = new BookingProviderAdopter(this, null);
         bookingAdapterCustomer = new BookingCustomerAdopter(this, null);
-        sqlHelper = new SqlHelper(this);
-    }
+        sqlHelper = new SqlHelper(this, null, null);
+        storageReference = FirebaseStorage.getInstance("gs://homestaybooking-f8308.appspot.com/").getReference("images/profiles/"+SharedPreferences.getUserId(this));
 
+        if (storageReference != null) {
+            storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
+                Picasso.get()
+                        .load(uri)
+                        .resize(180, 180)
+                        .centerCrop()
+                        .into(imageViewProfile);
+            });
+        }
+
+        profileEmail.setText(SharedPreferences.getEmail(this));
+        profileName.setText(SharedPreferences.getUserName(this));
+        profilePhone.setText(SharedPreferences.getPhoneNumber(this));
+    }
     private void setupDrawerAndToggle() {
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
     }
-
     private void checkInternetConnection() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
         if (connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected()) {
@@ -125,7 +139,6 @@ public class SampleActivity extends AppCompatActivity {
         }
         SharedPreferences.configureInternet(this);
     }
-
     private void updateInternetAvailability(boolean isAvailable) {
         FirebaseCRUD firebaseCRUD = new FirebaseCRUD(this, null, null);
 
@@ -134,7 +147,6 @@ public class SampleActivity extends AppCompatActivity {
         firebaseCRUD.setUserHasInternet(userId, isAvailable);
 
     }
-
     private void setupLogoutMenuItem() {
         logout.setOnMenuItemClickListener(item -> {
             FirebaseAuth.getInstance().signOut();
@@ -143,13 +155,11 @@ public class SampleActivity extends AppCompatActivity {
             return true;
         });
     }
-
     private void setupProfileImageClickListener() {
         imageViewProfile.setOnClickListener(v -> {
             selectImage();
         });
     }
-
     private void setupBottomNavigationView() {
         if (SharedPreferences.getUserType(this).equals("provider")) {
             bottomNavigationView.getMenu().clear();
@@ -163,7 +173,6 @@ public class SampleActivity extends AppCompatActivity {
             toggleGroup.check(R.id.client_mode);
         }
     }
-
     private void initClient() {
         MenuItem menuItemHomestaySearch = bottomNavigationView.getMenu().findItem(R.id.search_homestay);
         MenuItem menuItemBookingsClient = bottomNavigationView.getMenu().findItem(R.id.bookings_client);
@@ -175,25 +184,37 @@ public class SampleActivity extends AppCompatActivity {
             startActivity(new Intent(SampleActivity.this, ProviderHome.class));
             return true;
         });
-        ArrayList<Homestay> homestays = (ArrayList<Homestay>) sqlHelper.getAllOfflineHomestays();
+
+        setRecyclerElements();
+
+
+    }
+    private void setRecyclerElements() {
+        ArrayList<Homestay> homestays = (ArrayList<Homestay>) sqlHelper.getAllOfflineHomestaysList();
         ArrayList<Booking> bookings = (ArrayList<Booking>) sqlHelper.getAllMyBookingsInOtherHomestays();
         if (bookings.size() > 0) {
-            recyclerViewBookings.setLayoutManager(new LinearLayoutManager(this));
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            recyclerViewBookings.setLayoutManager(layoutManager);
             recyclerViewBookings.setAdapter(bookingAdapterCustomer);
+
             bookingAdapterCustomer.setBookingList(bookings);
         } else {
             recyclerViewBookings.setVisibility(View.GONE);
         }
 
-        if (homestays.size() > 0) {
-            recyclerViewHomestays.setLayoutManager(new LinearLayoutManager(this));
-            recyclerViewHomestays.setAdapter(homestayAdapter);
-            homestayAdapter.setHomestayList(homestays);
-        } else {
-            recyclerViewHomestays.setVisibility(View.GONE);
+        if (homestays != null) {
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            if (homestays.size() > 0 && homestays != null) {
+                recyclerViewHomestays.setLayoutManager(layoutManager);
+                recyclerViewHomestays.setAdapter(homestayAdapter);
+                homestayAdapter.setHomestayList(homestays);
+            } else {
+                recyclerViewHomestays.setVisibility(View.GONE);
+            }
         }
     }
-
     private void initProvider() {
         MenuItem menuItemHomestays = bottomNavigationView.getMenu().findItem(R.id.homestays);
         MenuItem menuItemBookingsProvider = bottomNavigationView.getMenu().findItem(R.id.bookings_provider);
@@ -225,7 +246,6 @@ public class SampleActivity extends AppCompatActivity {
         }
 
     }
-
     private void setupToggleGroup() {
         toggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (isChecked) {
@@ -245,7 +265,6 @@ public class SampleActivity extends AppCompatActivity {
             }
         });
     }
-
     private void setupInternetSwitch() {
         intSwitch.setOnClickListener(view -> {
             if (intSwitch.isChecked()) {
@@ -257,7 +276,6 @@ public class SampleActivity extends AppCompatActivity {
             }
         });
     }
-
     private void getLocation() {
         double latitude = gpsTracker.getLatitude();
         double longitude = gpsTracker.getLongitude();
@@ -265,14 +283,12 @@ public class SampleActivity extends AppCompatActivity {
         ReverseGeocodingTask reverseGeocodingTask = new ReverseGeocodingTask();
         reverseGeocodingTask.execute(latitude, longitude);
     }
-
     private void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent, 100);
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -290,11 +306,16 @@ public class SampleActivity extends AppCompatActivity {
             }
         }
     }
-
     private void uploadImageToStorage() {
         storageReference.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     Toast.makeText(SampleActivity.this, "Image Uploaded", Toast.LENGTH_SHORT).show();
                 });
     }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        setRecyclerElements();
+    }
+
 }

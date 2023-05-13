@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toolbar;
 
 import com.example.mobileapp.dbclasses.Homestay;
 import com.example.mobileapp.NewHomestay;
@@ -47,6 +48,7 @@ public class ProviderHome extends AppCompatActivity {
     private RelativeLayout relativeLayout;
 
     private MaterialToolbar toolbar;
+    private SqlHelper sqlHelper;
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -54,10 +56,29 @@ public class ProviderHome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_provider_home);
         homestaysList = new ArrayList<>();
+        sqlHelper = new SqlHelper(this,null,null);
 
         recyclerView = findViewById(R.id.myHomestaysRecyclerView);
         bottomNavigationView = (BottomNavigationView) findViewById(R.id.bottom_navigation);
         relativeLayout = findViewById(R.id.relativeLayout);
+        toolbar = findViewById(R.id.topAppBar);
+        toolbar.setNavigationOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                onBackPressed();
+            }
+        });
+
+        MenuItem resetItem = toolbar.getMenu().findItem(R.id.deleteAllOfflineHomestays);
+
+        resetItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
+                sqlHelper.deleteAllHomestays();
+
+                return false;
+            }
+        });
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -97,14 +118,14 @@ public class ProviderHome extends AppCompatActivity {
                     // Handle any errors here
                 }
             });
-            homestayAdapter = new HomestayAdapter(this, homestaysList);
+            homestayAdapter = new HomestayAdapter(this, homestaysList,false);
             recyclerView.setAdapter(homestayAdapter);
         }
         else {
-            SqlHelper sqlHelper = new SqlHelper(this);
+            SqlHelper sqlHelper = new SqlHelper(this,null,null);
 
             ArrayList<Homestay> homestays = sqlHelper.getAllHomestays();
-            homestayAdapter = new HomestayAdapter(this, homestays);
+            homestayAdapter = new HomestayAdapter(this, homestays,false);
             recyclerView.setAdapter(homestayAdapter);
         }
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -142,7 +163,6 @@ public class ProviderHome extends AppCompatActivity {
             System.out.println("longitude: " + longitude);
             System.out.println("latitude: " + latitude);
         }
-
 
     }
 

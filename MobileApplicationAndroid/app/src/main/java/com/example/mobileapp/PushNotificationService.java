@@ -71,7 +71,7 @@ public class PushNotificationService extends FirebaseMessagingService {
 //            String notificationType = remoteMessage.getData().get("notificationType");
 
             try {
-                SqlHelper sqlHelper = new SqlHelper(this);
+                SqlHelper sqlHelper = new SqlHelper(this,null,null);
 
                 JSONObject jsonData = new JSONObject(Objects.requireNonNull(remoteMessage.getData().get("data")));
                 System.out.println("jsonData: " + jsonData);

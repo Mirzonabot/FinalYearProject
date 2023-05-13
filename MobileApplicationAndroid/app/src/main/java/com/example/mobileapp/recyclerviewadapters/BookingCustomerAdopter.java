@@ -34,7 +34,7 @@ public class BookingCustomerAdopter extends RecyclerView.Adapter<BookingCustomer
         this.mContext = mContext;
         this.bookingList = bookingList;
         this.databaseReference = FirebaseDatabase.getInstance("https://homestaybooking-f8308-default-rtdb.europe-west1.firebasedatabase.app").getReference("booking");
-        sqlHelper = new SqlHelper(mContext);
+        sqlHelper = new SqlHelper(mContext,null,null);
         System.out.println("urreeee");
     }
 

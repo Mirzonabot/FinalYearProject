@@ -93,7 +93,7 @@ public class BookingFragement extends DialogFragment {
     }
 
     private void initListners() {
-        sqlHelper  = new SqlHelper(getActivity());
+        sqlHelper  = new SqlHelper(getActivity(),null,null);
         dateRange.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {

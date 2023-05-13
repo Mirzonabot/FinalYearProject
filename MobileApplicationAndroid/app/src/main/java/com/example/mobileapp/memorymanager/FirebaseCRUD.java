@@ -16,7 +16,10 @@ import com.example.mobileapp.CustomInfoWindow;
 import com.example.mobileapp.DataSender;
 import com.example.mobileapp.DistanceBetweenLocations;
 import com.example.mobileapp.GPSTracker;
+import com.example.mobileapp.MarkerCustomized;
+import com.example.mobileapp.NewHomestay;
 import com.example.mobileapp.dbclasses.Homestay;
+import com.example.mobileapp.dbclasses.TokenUserID;
 import com.example.mobileapp.homepages.CustomerHome;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,6 +53,7 @@ public class FirebaseCRUD{
     private Location myLocation;
     private FragmentManager supportFragmentManager;
     private CustomerHome customerHome;
+    private NewHomestay newHomestay;
 
     public FirebaseCRUD(Context context, MapView mapView, FragmentManager supportFragmentManager) {
         this.context = context;
@@ -57,6 +61,7 @@ public class FirebaseCRUD{
         this.myLocation = new GPSTracker(context).getLocation();
         this.supportFragmentManager = supportFragmentManager;
         this.customerHome = new CustomerHome();
+        this.newHomestay = new NewHomestay();
     }
     public List<Homestay> getHomestays() {
 
@@ -66,7 +71,7 @@ public class FirebaseCRUD{
 
     public void getAllHomestays(){
 
-        List<Marker> markers = new ArrayList<>();
+        List< MarkerCustomized> markers = new ArrayList<>();
         GPSTracker myLocation = new GPSTracker(context);
 
         homestayDatabaseReference.addValueEventListener(new ValueEventListener() {
@@ -75,7 +80,7 @@ public class FirebaseCRUD{
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 if (myLocation != null) {
-                    Marker marker = new Marker(mapView);
+                     MarkerCustomized marker = new  MarkerCustomized(mapView,null);
                     marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
                     BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
 
@@ -85,13 +90,13 @@ public class FirebaseCRUD{
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Homestay homestay = dataSnapshot.getValue(Homestay.class);
                     GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()),Double.parseDouble(homestay.getLongitude()));
-                    OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
+                    OverlayItem item = new OverlayItem(homestay.getHomestayName(), String.valueOf(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K')), point);
 
-                    Marker marker = new Marker(mapView);
+                     MarkerCustomized marker = new  MarkerCustomized(mapView,homestay);
                     marker.setPosition(point);
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     marker.setTitle(homestay.getHomestayName());
-                    marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                    marker.setSnippet(String.valueOf(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K')));
                     CustomInfoWindow infoWindow = new CustomInfoWindow(context,mapView, supportFragmentManager,homestay);
                     marker.setInfoWindow(infoWindow);
                     markers.add(marker);
@@ -110,7 +115,7 @@ public class FirebaseCRUD{
 
     public void getAllHomestaysInProximity(double distance){
 
-            List<Marker> markers = new ArrayList<>();
+            List< MarkerCustomized> markers = new ArrayList<>();
 
 
             homestayDatabaseReference.addValueEventListener(new ValueEventListener() {
@@ -119,7 +124,7 @@ public class FirebaseCRUD{
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                     if (myLocation != null) {
-                        Marker marker = new Marker(mapView);
+                         MarkerCustomized marker = new  MarkerCustomized(mapView,null);
                         marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
                         BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
 
@@ -130,13 +135,11 @@ public class FirebaseCRUD{
                         Homestay homestay = dataSnapshot.getValue(Homestay.class);
                         if(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') <= distance) {
                             GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()));
-                            OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
-
-                            Marker marker = new Marker(mapView);
+                             MarkerCustomized marker = new  MarkerCustomized(mapView,homestay);
                             marker.setPosition(point);
                             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                             marker.setTitle(homestay.getHomestayName());
-                            marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                            marker.setSnippet(String.valueOf(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K')));
                             CustomInfoWindow infoWindow = new CustomInfoWindow(context, mapView, supportFragmentManager, homestay);
                             marker.setInfoWindow(infoWindow);
                             markers.add(marker);
@@ -155,7 +158,7 @@ public class FirebaseCRUD{
     }
 
     public void getHomestaysByAddress(String searchBy, String address) {
-        List<Marker> markers = new ArrayList<>();
+        List< MarkerCustomized> markers = new ArrayList<>();
 
         Query query = null;
         if (searchBy.equals("By village")) {
@@ -179,7 +182,7 @@ public class FirebaseCRUD{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (myLocation != null) {
-                    Marker marker = new Marker(mapView);
+                     MarkerCustomized marker = new  MarkerCustomized(mapView,null);
                     marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
                     BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
 
@@ -189,13 +192,11 @@ public class FirebaseCRUD{
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Homestay homestay = dataSnapshot.getValue(Homestay.class);
                         GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()));
-                        OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
-
-                        Marker marker = new Marker(mapView);
+                         MarkerCustomized marker = new  MarkerCustomized(mapView,homestay);
                         marker.setPosition(point);
                         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                         marker.setTitle(homestay.getHomestayName());
-                        marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                        marker.setSnippet(String.valueOf(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K')));
                         CustomInfoWindow infoWindow = new CustomInfoWindow(context, mapView, supportFragmentManager, homestay);
                         marker.setInfoWindow(infoWindow);
                         markers.add(marker);
@@ -228,14 +229,14 @@ public class FirebaseCRUD{
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<GeoPoint> points = new ArrayList<>();
-                ArrayList<Marker> markers = new ArrayList<>();
+                ArrayList< MarkerCustomized> markers = new ArrayList<>();
                 List<OverlayItem> items = new ArrayList<>();
 
 
                 if (myLocation != null) {
                     points.add(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
 
-                    Marker marker = new Marker(mapView);
+                     MarkerCustomized marker = new  MarkerCustomized(mapView,null);
                     marker.setPosition(new GeoPoint(myLocation.getLatitude(), myLocation.getLongitude()));
                     BitmapDrawable bitmapDrawable = new BitmapDrawable(context.getResources(), createCircleBitmap(Color.RED, Color.BLACK, 20));
 
@@ -245,15 +246,15 @@ public class FirebaseCRUD{
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Homestay homestay = dataSnapshot.getValue(Homestay.class);
                     GeoPoint point = new GeoPoint(Double.parseDouble(homestay.getLatitude()),Double.parseDouble(homestay.getLongitude()));
-                    OverlayItem item = new OverlayItem(homestay.getHomestayName(), "Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km", point);
+                    OverlayItem item = new OverlayItem(homestay.getHomestayName(),   String.valueOf(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K')), point);
                     items.add(item);
                     points.add(point);
 
-                    Marker marker = new Marker(mapView);
+                     MarkerCustomized marker = new  MarkerCustomized(mapView,homestay);
                     marker.setPosition(point);
                     marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                     marker.setTitle(homestay.getHomestayName());
-                    marker.setSnippet("Distance: " + DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K') + "km");
+                    marker.setSnippet(String.valueOf(DistanceBetweenLocations.distance(myLocation.getLatitude(), myLocation.getLongitude(), Double.parseDouble(homestay.getLatitude()), Double.parseDouble(homestay.getLongitude()), 'K')));
 //                    System.out.println("custom info window");
                     CustomInfoWindow infoWindow = new CustomInfoWindow(context,mapView, supportFragmentManager,homestay);
                     marker.setInfoWindow(infoWindow);
@@ -284,7 +285,9 @@ public class FirebaseCRUD{
         return list;
     }
 
+    private void deleteAllHomestays(){
 
+    }
 
     private static Bitmap createCircleBitmap(int fillColor, int strokeColor, int radius) {
         Bitmap output = Bitmap.createBitmap(radius * 2, radius * 2, Bitmap.Config.ARGB_8888);
@@ -322,6 +325,32 @@ public class FirebaseCRUD{
         });
     }
 
+    public void getUserById(String userId){
+        userDatabaseReference.child(userId).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                TokenUserID user = dataSnapshot.getValue(TokenUserID.class);
+                System.out.println("getUserById: " + user);
+//                newHomestay.sendInputToNewHomestay(user.getUserPhoneNumber());
+            }
+        });
+    }
+
+    public void createHomestay(Homestay homestay){
+        System.out.println("createHomestay: " + homestay);
+        homestayDatabaseReference.child(homestay.getId()).setValue(homestay).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                System.out.println("createHomestay: " + homestay + " success");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                System.out.println("createHomestay: " + homestay + " failed");
+            }
+        });
+    }
+
 
 
 
@@ -330,4 +359,6 @@ public class FirebaseCRUD{
         CustomerHome customerHome = new CustomerHome();
 //        customerHome.sendData("search");
     }
+
+
 }

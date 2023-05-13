@@ -77,7 +77,7 @@ public class ProviderBookings extends AppCompatActivity {
         else {
             System.out.println("No internet");
             System.out.println("Getting data from local database");
-            SqlHelper sqlHelper = new SqlHelper(this);
+            SqlHelper sqlHelper = new SqlHelper(this,null,null);
             ArrayList<Booking> bookingsList1 = sqlHelper.getAllBookingsInMyHomestays();
 //            System.out.println("_______________________________________");
 //            System.out.println("_______________________________________");

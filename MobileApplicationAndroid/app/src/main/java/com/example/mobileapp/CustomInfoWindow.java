@@ -16,6 +16,8 @@ import com.example.mobileapp.dbclasses.Homestay;
 import com.example.mobileapp.fragments.BookingFragement;
 import com.example.mobileapp.memorymanager.SharedPreferences;
 import com.example.mobileapp.memorymanager.SqlHelper;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
@@ -24,18 +26,20 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 
+import java.text.DecimalFormat;
+
 public class CustomInfoWindow extends InfoWindow {
     private Context mContext;
     private Marker mMarker;
 
     private Homestay homestay;
-    private TextView titleTextView;
-    private TextView snippetTextView;
+    private TextView titleTextView, addressTextView, capacityTextView, distanceTextView;
     private FragmentManager supportFragmentManager;
     private Button addToOffline;
     private SqlHelper sqlHelper;
     private ImageView homestayImage;
     private StorageReference storageReference;
+    private MapView mapView;
 
     public CustomInfoWindow(Context context, MapView mapView, FragmentManager supportFragmentManager, Homestay homestay) {
 //        System.out.println("CustomInfoWindow");
@@ -43,22 +47,24 @@ public class CustomInfoWindow extends InfoWindow {
         System.out.println("CustomInfoWindow");
         mContext = context;
         this.homestay = homestay;
+        this.mapView = mapView;
         storageReference = FirebaseStorage.getInstance("gs://homestaybooking-f8308.appspot.com/").getReference("images/homestays/"+homestay.getId());
         this.supportFragmentManager = supportFragmentManager;
         System.out.println("CustomInfoWindow");
-        sqlHelper = new SqlHelper(context);
+        sqlHelper = new SqlHelper(context,null,null);
     }
 
     @Override
     public void onOpen(Object item) {
-        System.out.println("onOpen");
-        System.out.println(homestay);
+        InfoWindow.closeAllInfoWindowsOn(mapView);
         mMarker = (Marker) item;
 
         titleTextView = mView.findViewById(R.id.titleTextView);
-        snippetTextView = mView.findViewById(R.id.snippetTextView);
+        addressTextView = mView.findViewById(R.id.addressTextView);
+        capacityTextView = mView.findViewById(R.id.capacityTextView);
+        distanceTextView = mView.findViewById(R.id.distanceTextView);
         addToOffline = mView.findViewById(R.id.addToOffline);
-        homestayImage = mView.findViewById(R.id.homestayImageView);
+        homestayImage = mView.findViewById(R.id.homestayCardView);
 
         if (!SharedPreferences.isInternetAvailable(mContext) || sqlHelper.homestayIsInOfflineTable(homestay.getId()))
         {
@@ -66,9 +72,15 @@ public class CustomInfoWindow extends InfoWindow {
         }
 
         titleTextView.setText(mMarker.getTitle());
-        snippetTextView.setText(mMarker.getSnippet());
+        DecimalFormat df = new DecimalFormat("#.##");
 
-        RelativeLayout relativeLayout = mView.findViewById(R.id.relativeLayout);
+        String formatted = df.format(Double.parseDouble(mMarker.getSnippet()));
+
+        distanceTextView.setText("Distance: " + formatted+" km");
+        addressTextView.setText("Address: " + homestay.getAddress());
+        capacityTextView.setText("Capacity: " + homestay.getHomestayCapacity());
+
+        MaterialCardView relativeLayout = mView.findViewById(R.id.relativeLayout);
 
 
         try {

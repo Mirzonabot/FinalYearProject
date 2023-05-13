@@ -178,9 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Add Image"
-                    android:textColor="@android:color/white"
                     android:textSize="16sp"
-                    app:backgroundTint="@color/accent"
                     app:cornerRadius="8dp" />
 
                 <com.google.android.material.button.MaterialButton
@@ -189,9 +187,7 @@
                     android:layout_height="wrap_content"
                     android:text="Add map"
                     android:layout_weight="1"
-                    android:textColor="@android:color/white"
                     android:textSize="20sp"
-                    app:backgroundTint="@color/accent"
                     app:cornerRadius="8dp" />
             </LinearLayout>
 
@@ -203,7 +199,6 @@
                 android:text="Add Homestay"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                app:backgroundTint="@color/accent"
                 app:cornerRadius="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
